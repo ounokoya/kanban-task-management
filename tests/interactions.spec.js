@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { open, DATA, THEME_KEY, SIDEBAR_KEY, main, nav, title, card, cardsIn, titlesIn, columnHeading, addTask, boardMenu, themeSwitch, button, dialog, field, status, style, sameColor, pixel, hex, close } from './helpers.js'
+import { open, DATA, THEME_KEY, SIDEBAR_KEY, main, nav, title, card, cardsIn, titlesIn, columnHeading, addTask, boardMenu, taskMenu, themeSwitch, button, dialog, field, status, style, sameColor, pixel, hex, close } from './helpers.js'
 
 // Spec §6 et §8 — contrôles de bout en bout au clavier et à la souris (S27, S30, S10), puis survol, mouvements, focus (S32 à S34)
 
@@ -80,6 +80,21 @@ test('Menu du tableau au clavier : Entrée ouvre Edit Board et Delete Board, Éc
   await page.keyboard.press('Enter')
   await expect(dialog(page, 'Edit Board')).toBeVisible()
   await expect(field(dialog(page, 'Edit Board'), 'Board Name')).toHaveValue('Platform Launch')
+})
+
+// Menu de la tâche dans « voir une tâche » : il déborde du dialogue, entier et cliquable (maquette « View Task - Active »)
+test('Menu de la tâche : ouvert depuis le dialogue, Edit Task et Delete Task entiers et cliquables hors du dialogue', async ({ page }) => {
+  await open(page, 1440)
+  const t = DATA.boards[0].columns[1].tasks[5].title
+  await card(page, t).click()
+  await taskMenu(dialog(page, t)).click()
+  const menu = button(page, 'Edit Task').locator('..')
+  await expect(menu).toBeInViewport({ ratio: 1 })
+  // les coins du menu dépassent du dialogue (480 px de large) : rien ne les coupe ni ne les recouvre
+  const corners = await menu.evaluate((el) => { const b = el.getBoundingClientRect(); return [[b.left + 8, b.top + 8], [b.right - 8, b.top + 8], [b.right - 8, b.bottom - 8], [b.left + 8, b.bottom - 8]].map(([x, y]) => el.contains(document.elementFromPoint(x, y))) })
+  expect(corners, 'coins du menu visibles').toEqual([true, true, true, true])
+  await button(page, 'Delete Task').click()
+  await expect(page.getByRole('alertdialog', { name: 'Delete this task?' })).toBeVisible()
 })
 
 const hoverCheck = async (page, locator, checks, what) => {
