@@ -145,13 +145,6 @@
   h1[tabindex="-1"]:focus {
     outline: none;
   }
-
-  input:not([type="checkbox"]):focus-visible,
-  select:focus-visible,
-  textarea:focus-visible {
-    outline: none;
-    border-color: var(--color-violet);
-  }
 }
 
 /* composants réutilisés (utilitaires Tailwind : utilisables dans le balisage et avec @apply) */
@@ -189,6 +182,13 @@
 
   &[aria-invalid="true"] {
     border-color: var(--color-red);
+  }
+
+  /* focus : bordure violette épaissie d'un anneau de 1 px, un indice qui ne tient pas qu'à la couleur (§6, A7) */
+  &:focus-visible {
+    outline: none;
+    border-color: var(--color-violet);
+    box-shadow: 0 0 0 0.0625rem var(--color-violet);
   }
 }
 
