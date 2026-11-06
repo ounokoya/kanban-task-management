@@ -11,7 +11,7 @@ Un tableau de tâches à la Kanban : plusieurs tableaux, chacun fait de colonnes
 
 | # | Règle | Origine |
 |---|---|---|
-| D1 | Un tableau : `name`, `columns` ; une colonne : `name`, `tasks` ; une tâche : `title`, `description`, `status` (= nom de sa colonne), `subtasks` ; une sous-tâche : `title`, `isCompleted` | `data.json` |
+| D1 | Un tableau : `name`, `columns` ; une colonne : `name`, `tasks` ; une tâche : `title`, `description`, `status`, `subtasks` ; une sous-tâche : `title`, `isCompleted` ; le statut d'une tâche est le nom de la colonne qui la contient : un statut vide ou différent (4 tâches de `data.json` ont un statut vide) est remplacé par ce nom au chargement | `data.json` |
 | D2 | Premier chargement (rien dans le navigateur) : les 3 tableaux de `data.json`, dans leur ordre ; ensuite, les tableaux gardés (clé `kanban/boards` du `localStorage`) ; un tableau gardé illisible, ou qui n'a pas la forme de D1, est ignoré : `data.json` est relu | README, Q-B15 |
 | D3 | Adresse d'un tableau : `#/board/<nom en minuscules, mots reliés par des tirets>` (`#/board/platform-launch`) ; deux tableaux du même nom : `-2`, `-3`… ; une adresse inconnue ouvre le premier tableau | Q-B1 |
 | D4 | Nom d'un tableau et de chaque colonne obligatoires (« Can't be empty ») ; deux colonnes du même nom dans un tableau, sans tenir compte de la casse : « Used » | README, Q-B6 |
@@ -36,7 +36,7 @@ Nom du tableau ouvert (`h1`) ; « + Add New Task » (« + » seul sous 768 px) ;
 
 ### 3.3 Tableau
 
-Une colonne par colonne du tableau : point de couleur, titre « TODO (4) » (capitales), puis les cartes (titre de la tâche, « 0 of 3 subtasks »). À droite, « + New Column ». Tableau sans colonne : « This board is empty. Create a new column to get started. » et « + Add New Column ». Plus aucun tableau : « There are no boards. Create a new board to get started. » et « + Create New Board » (Q-B11). Le tableau défile dans les deux sens ; la page jamais horizontalement (Q-B14).
+Une colonne par colonne du tableau : point de couleur, titre « TODO (4) » (capitales), puis les cartes (titre de la tâche, « 0 of 3 subtasks »). Les compteurs suivent les données : la maquette en montre parfois d'autres (« Design settings and search pages » : « 1 of 3 » dans la maquette, 2 sous-tâches sur 3 cochées dans `data.json`). À droite, « + New Column ». Tableau sans colonne : « This board is empty. Create a new column to get started. » et « + Add New Column ». Plus aucun tableau : « There are no boards. Create a new board to get started. » et « + Create New Board » (Q-B11). Le tableau défile dans les deux sens ; la page jamais horizontalement (Q-B14).
 
 ### 3.4 Voir une tâche (dialogue modal)
 
@@ -102,7 +102,7 @@ Positions de la maquette (px, coin haut gauche ; à 1 px près, 2 px pour les te
 | Titre « TODO (4) » · 1ʳᵉ carte | (351, 121) · (324, 160) 280 × 88 | (312, 104) · (285, 143) 280 × 88 | (43, 88) · (16, 127) 280 × 88 |
 | « + New Column » | (1236, 160) 280 × 814 | (1197, 143) 280 × 814 | (928, 127) 280 × 814 |
 | Tableau ouvert dans la barre | (0, 146) 276 × 48 | (0, 146) 240 × 48 | choix du tableau : (54, 130) 240 × 48 |
-| Interrupteur du thème · « Hide Sidebar » | (24, 888) 251 × 48 · (0, 944) 276 × 48 | (13, 880) 235 × 48 · (0, 944) 240 × 48 | choix du tableau : (70, 338) 235 × 48 |
+| Cadre du thème · interrupteur · « Hide Sidebar » | (24, 888) 251 × 48 · (130, 902) 40 × 20 · (0, 944) 276 × 48 | (13, 880) 235 × 48 · (112, 894) 40 × 20 · (0, 944) 240 × 48 | choix du tableau : cadre (70, 338) 235 × 48, interrupteur (169, 352) 40 × 20 |
 | Barre masquée : « Show Sidebar » · 1ʳᵉ colonne | (0, 944) 56 × 48 · x 24 | (0, 944) 56 × 48 · x 24 | — |
 | Voir une tâche | (480, 251) 480 × 523, centrée | (144, 251) 480 × 523 | (16, 207) 343 × 557 dans 375 × 970 |
 | Suppression | (480, 398) 480 × 229, centrée | (144, 398) 480 × 229 | (16, 343) 343 × 284 dans 375 × 970 |
@@ -150,7 +150,7 @@ Aucune transition si `prefers-reduced-motion: reduce`.
 | A7 | Focus visible sur chaque élément interactif ; ordre clavier = ordre de lecture |
 | A8 | Pas de transition si `prefers-reduced-motion: reduce` |
 | A9 | Changement de tableau, déplacement d'une carte (glisser ou clavier), changement de statut, sous-tâche cochée : annoncés (région de statut) |
-| A10 | Un dialogue ou un menu fermé rend le focus à l'élément qui l'a ouvert ; après une suppression, le focus va au titre du tableau |
+| A10 | Un dialogue ou un menu fermé rend le focus à l'élément qui l'a ouvert (ouvert depuis un menu : au bouton du menu ; suppression d'une tâche annulée : à sa carte) ; après une suppression, le focus va au titre du tableau |
 
 ### Noms accessibles utilisés par les tests
 
@@ -231,5 +231,5 @@ U3 D6 : ajouter une tâche, changer son statut : en bas de la colonne
 U4 D7 : renommer une colonne renomme le statut de ses tâches ; retirer une colonne retire ses tâches
 U5 D12 : déplacer une tâche (même colonne, autre colonne, place donnée) ; ordre des autres gardé
 U6 D11 : compteurs « 1 of 3 subtasks », « Todo (4) » ; D10 : couleur des colonnes selon leur place
-U7 D2 : forme des données gardées : data.json acceptée, chaque défaut refusé (tableau sans colonnes, tâche sans titre, statut qui n'est pas une colonne, sous-tâche sans isCompleted)
+U7 D1, D2 : forme des données gardées : data.json acceptée, chaque défaut refusé (tableau sans colonnes, tâche sans titre, statut qui n'est pas un texte, sous-tâche sans isCompleted) ; au chargement, le statut devient le nom de la colonne
 ```
