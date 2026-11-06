@@ -162,6 +162,7 @@ test('S27 — Alt + ↓ ↑ → ← sur une carte : elle descend, remonte, passe
 
 // S39 : la consigne du déplacement au clavier est lue sur chaque carte ; le focus d'un champ ne tient pas qu'à sa couleur
 test('S39 — une carte décrit Alt + flèches ; un champ au focus a une bordure violette épaissie', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await open(page, 1440)
   await expect(card(page, TODO[0])).toHaveAccessibleDescription(/Alt.*arrow/i)
   await addTask(page).click()
