@@ -90,7 +90,7 @@ Plus Jakarta Sans (Bold 700, Medium 500) : Heading XL 24/30, L 18/23, M 15/19, S
 | 768 à 1023 px | barre latérale de 261 px (masquable) ; en-tête de 81 px ; colonnes à 24 px de la barre |
 | ≥ 1024 px | barre latérale de 300 px (masquable) ; en-tête de 97 px |
 
-Colonnes de 280 px, 24 px entre deux ; cartes de 280 px, 88 px de haut pour un titre d'une ligne, 20 px entre deux ; dialogues de 480 px (343 sous 768 px), centrés, marges intérieures 32 px (24 sous 768 px).
+Colonnes de 280 px, 24 px entre deux ; cartes de 280 px, 88 px de haut pour un titre d'une ligne, 20 px entre deux ; dialogues de 480 px (343 sous 768 px), centrés, marges intérieures 32 px (24 sous 768 px, 32 en bas de « Voir une tâche ») ; une ligne de sous-tâche : 40 px, 19 px de plus par ligne de texte (59 pour deux lignes, comme la maquette).
 
 Positions de la maquette (px, coin haut gauche ; à 1 px près, 2 px pour les textes) :
 
@@ -104,10 +104,12 @@ Positions de la maquette (px, coin haut gauche ; à 1 px près, 2 px pour les te
 | Tableau ouvert dans la barre | (0, 146) 276 × 48 | (0, 146) 240 × 48 | choix du tableau : (54, 130) 240 × 48 |
 | Cadre du thème · interrupteur · « Hide Sidebar » | (24, 888) 251 × 48 · (130, 902) 40 × 20 · (0, 944) 276 × 48 | (13, 880) 235 × 48 · (112, 894) 40 × 20 · (0, 944) 240 × 48 | choix du tableau : cadre (70, 338) 235 × 48, interrupteur (169, 352) 40 × 20 |
 | Barre masquée : « Show Sidebar » · 1ʳᵉ colonne | (0, 944) 56 × 48 · x 24 | (0, 944) 56 × 48 · x 24 | — |
-| Voir une tâche | (480, 251) 480 × 523, centrée | (144, 251) 480 × 523 | (16, 207) 343 × 557 dans 375 × 970 |
+| Voir une tâche | (480, 251) 480 × 523, centrée | (144, 251) 480 × 523 | (16, 188) 343 × 595 dans 375 × 970 ¹ |
 | Suppression | (480, 398) 480 × 229, centrée | (144, 398) 480 × 229 | (16, 343) 343 × 284 dans 375 × 970 |
 | Choix du tableau | — | — | (54, 80) 264 × 322 |
 | Tableau vide : « + Add New Column » | (782, 516) 174 × 48 | (427, 480) 174 × 48 | centré |
+
+¹ La maquette mobile montre (16, 207) 343 × 557 avec une 3ᵉ sous-tâche d'une ligne (« Surveying and testing ») ; celle de `data.json` (« Talk to potential customers about our proposed solution and ask for fair price expectancy ») prend trois lignes à cette largeur, soit 38 px de plus.
 
 ## 6. États et interactions
 
@@ -219,7 +221,7 @@ S35 Given le tableau, chaque dialogue, à 375, 768 et 1440, dans les deux thème
 S36 Given le HTML servi et chaque vue rendue   Then validateur W3C Nu et html-validate (réglage FM) sans erreur ; eslint sans erreur ; gardes des règles FM (rem, aria-label, CSS logique)
 
 Visuel (G3-6, G3-7 : 5 %, références corrigées hors dépôt ; tests sautés sans design/)
-S37 Given les 24 écrans de G3-6   Then chaque capture vs design/reference-aa/<écran>.png ≤ 5,0 %
+S37 Given les 24 écrans de G3-6 (« voir une tâche » avec les sous-tâches de la maquette : §3.3, §5 note ¹)   Then chaque capture vs design/reference-aa/<écran>.png ≤ 5,0 %
 ```
 
 Règles sans navigateur (`node --test tests/unit/`)
