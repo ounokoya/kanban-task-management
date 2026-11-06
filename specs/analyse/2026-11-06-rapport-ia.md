@@ -68,3 +68,15 @@ Sous 9,0 : Testing seul. Les autres parties n'ont plus que des points forts.
 
 **124 / 124** (8 unitaires, 116 Playwright) ; README à 124 tests ; en attente de l'accord pour pousser `main` et regénérer.
 
+## Rapport regénéré après les tests L1, L2 (accord de Koya : « Oui, pousse et regénère »)
+
+`main` poussé (tests et README ; le site n'a pas changé). Rapport regénéré : **9,6 / 10, toutes les notes ≥ 9,0**.
+
+| Partie | Note |
+|---|---|
+| Code Quality | 9,5 : Best Practices 9,5 · File Organization 9,7 · Architecture 9,6 · Testing **9,2** (6,1 → 8,7 → 9,2) |
+| Design & UX | 9,8 : Accessibility 9,8 |
+| Documentation | 9,8 : README 9,9 · Commits 9,7 |
+
+Aucune remarque « suggestion » ni « needs attention » : seulement des points forts. Le résumé de Testing propose, en piste, plus de cas d'erreur de validation dans les formulaires de modification. Plus rien à corriger pour l'objectif de Koya.
+
