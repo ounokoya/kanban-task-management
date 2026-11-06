@@ -77,6 +77,8 @@
       <button type="button" class="btn-primary-l mx-auto inline-[10.875rem]" onclick={(event) => oneditboard(event.currentTarget)}>+ Add New Column</button>
     </div>
   {:else}
+    <!-- consigne lue sur chaque carte (A9) -->
+    <p id="move-help" class="sr-only">Alt + arrow keys move the task: up or down in its column, left or right to the next column.</p>
     <div class="flex inline-max gap-6 ps-4 pe-6 pt-6 pb-12 md:ps-6 md:pt-[1.4375rem] lg:pt-6">
       {#each board.columns as column, c (c)}
         <section bind:this={sections[c]} aria-labelledby="column-{c}" class="inline-70 shrink-0">
@@ -94,6 +96,7 @@
                   <button
                     type="button"
                     data-at={at(c, row.t)}
+                    aria-describedby="move-help"
                     class="group inline-full cursor-pointer touch-manipulation rounded-card bg-surface px-4 py-[1.4375rem] text-start shadow-card select-none"
                     onclick={(event) => open(event, place)}
                     onkeydown={(event) => onkeydown(event, place)}
