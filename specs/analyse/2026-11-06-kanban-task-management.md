@@ -74,3 +74,9 @@ Avant le code, un conflit entre deux tests : U6 attendait les couleurs des colon
 ## 5. Verdict
 
 Les 37 critères de la spec, les 7 règles, les 24 écrans et les fitness functions passent ; le parcours réel a trouvé un écart, corrigé et couvert par un test. Prêt pour la Phase 9 (README, CHANGELOG) ; publication et soumission avec l'accord de Koya.
+
+## 6. Publication (Phase 12)
+
+Accord de Koya (« Oui, publie »). Dépôt public [`ounokoya/kanban-task-management`](https://github.com/ounokoya/kanban-task-management) : `main` et le tag `v1.0.0` ; `dist/` publié sur `gh-pages` (`npm run deploy`), Pages activé sur `gh-pages` par GitHub.
+
+`BASE_URL=https://ounokoya.github.io/kanban-task-management/ npx playwright test` : **109 réussis sur 109** sur le site en ligne (les 24 écrans visuels compris, références présentes sur ce poste).
