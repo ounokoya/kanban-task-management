@@ -1,10 +1,10 @@
 """Rend des écrans d'un .fig décodé (message.json de kiwi_fig.py) en SVG : tracés précalculés par Figma
-(formes, contours, lettres), couleurs, dégradés linéaires, opacités, ombres portées, découpe des cadres, images.
+(formes, contours, lettres), couleurs, dégradés linéaires, barrés et soulignements, opacités, ombres portées, découpe des cadres, images.
 Usage : python3 -I fig_render.py <message.json> <dossier images> <dossier sortie> [motif de nom d'écran] [--aa]
 --aa : teintes AA validées (scripts/fig/aa.py)."""
 import base64, collections, json, os, re, struct, sys, html
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from aa import remap
+from aa import remap, opaque
 AA = '--aa' in sys.argv
 sys.argv = [a for a in sys.argv if a != '--aa']
 
@@ -104,7 +104,7 @@ def render(node, top=False):
     CTX['node'] = node
     t = node.get('transform', {}); out = []
     m = (1, 0, 0, 1, 0, 0) if top else (t.get('m00', 1), t.get('m10', 0), t.get('m01', 0), t.get('m11', 1), t.get('m02', 0), t.get('m12', 0))
-    op = node.get('opacity', 1)
+    op = 1 if AA and opaque(node) else node.get('opacity', 1)  # texte éclairci par opacité : couleur AA opaque
     attrs = f' transform="matrix({",".join(f"{v:.4f}" for v in m)})"' + (f' opacity="{op}"' if op < 1 else '')
     typ = node.get('type'); size = node.get('size', {'x': 0, 'y': 0})
     body = []
@@ -118,6 +118,9 @@ def render(node, top=False):
             fill = style_fill(node, sid) or 'black'
             fs = g.get('fontSize', node.get('fontSize', 16)); pos = g['position']
             body.append(f'<path d="{path(g["commandsBlob"], fs, True, pos["x"], pos["y"])}" fill="{fill}"/>')
+        for dec in td.get('decorations') or []:  # barré et soulignement : rectangles précalculés par Figma
+            fill = style_fill(node, dec.get('styleID', 0)) or 'black'
+            for r in dec.get('rects', []): body.append(f'<rect x="{r["x"]:.3f}" y="{r["y"]:.3f}" width="{r["w"]:.3f}" height="{r["h"]:.3f}" fill="{fill}"/>')
     else:
         fill = paint(node.get('fillPaints'), size)
         for geo in node.get('fillGeometry') or []:
@@ -142,7 +145,7 @@ def render(node, top=False):
 
 frames = [n for n in nodes if n.get('type') == 'FRAME' and n.get('parentIndex') and by.get(gid(n['parentIndex']['guid']), {}).get('type') == 'CANVAS' and pattern.search(n.get('name', ''))]
 for f in frames:
-    defs.clear(); CTX['dark'] = '[Dark]' in f['name']; CTX['frame'] = f['name']
+    defs.clear(); CTX['dark'] = bool(re.search(r'\bDark\b', f['name'])); CTX['frame'] = f['name']
     body = render(f, top=True)
     w, h = f['size']['x'], f['size']['y']
     svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{w:g}" height="{h:g}" viewBox="0 0 {w:g} {h:g}"><defs>{"".join(defs)}</defs>{body}</svg>'

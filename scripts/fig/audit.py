@@ -4,7 +4,7 @@ Usage : python3 -I scripts/fig/audit.py design/fig/message.json '<motif des écr
 --aa : avec les teintes AA validées (scripts/fig/aa.py)."""
 import collections, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from aa import remap
+from aa import remap, opaque
 AA = '--aa' in sys.argv
 sys.argv = [a for a in sys.argv if a != '--aa']
 
@@ -45,11 +45,11 @@ results = collections.defaultdict(list)
 frames = [n for n in nodes if n.get('type') == 'FRAME' and by.get(gid((n.get('parentIndex') or {}).get('guid')), {}).get('type') == 'CANVAS' and pat.search(n.get('name', ''))]
 for f in frames:
     painted = []  # (x0, y0, x1, y1, couleur avec opacité)
-    CTX['dark'] = '[Dark]' in f['name']; CTX['frame'] = f['name']
+    CTX['dark'] = bool(re.search(r'\bDark\b', f['name'])); CTX['frame'] = f['name']
     def walk(n, x, y, op):
         if not n.get('visible', True): return
         CTX['node'] = n
-        t = n.get('transform', {}); x += t.get('m02', 0); y += t.get('m12', 0); op *= n.get('opacity', 1); s = n.get('size', {})
+        t = n.get('transform', {}); x += t.get('m02', 0); y += t.get('m12', 0); op *= 1 if AA and opaque(n) else n.get('opacity', 1); s = n.get('size', {})
         if n['type'] == 'TEXT':
             c = text_color(n)
             if c:
