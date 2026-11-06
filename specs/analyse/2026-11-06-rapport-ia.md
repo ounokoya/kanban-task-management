@@ -59,3 +59,12 @@ Sous 9,0 : Testing seul. Les autres parties n'ont plus que des points forts.
 | L1 | Testing (« needs attention ») | Le survol en sombre ouvre la suppression d'un tableau sans la confirmer (`interactions.spec.js:270`) | **Faux positif sur le fond** : S14 et S16 (`boards.spec.js`) suppriment après confirmation ; absent d'`interactions.spec.js` (M52) | S38 : supprimer un tableau au clavier seul (Cancel, puis Delete : tableau, lien et données retirés, Marketing Plan ouvert, focus sur son titre) ; le survol en sombre confirme la suppression |
 | L2 | Testing (« needs attention ») | Tous les scénarios ouvrent l'app à 1440 px | **Faux positif sur le fond** : S1 à S6 (`layout.spec.js`), S9, S26 et S35 testent 375 et 768 px ; mais `interactions.spec.js` reste à 1440 | S40 en tête d'`interactions.spec.js` : à 375 px, choisir un tableau, ajouter une tâche par « + », changer son statut, colonnes qui défilent ; à 768 px, barre masquée puis montrée, tâche ajoutée |
 
+### Suite en local (tests seulement, l'app ne change pas)
+
+| # | Fait | Test |
+|---|---|---|
+| L1 | S38 : supprimer un tableau au clavier seul (Cancel, puis Delete) ; le survol en sombre confirme la suppression | verts d'emblée (gardes) |
+| L2 | S40 en tête d'`interactions.spec.js` : 375 px (choix du tableau, « + », statut, colonnes qui défilent, page non) et 768 px (barre masquée puis montrée, tâche ajoutée) | verts d'emblée (gardes) |
+
+**124 / 124** (8 unitaires, 116 Playwright) ; README à 124 tests ; en attente de l'accord pour pousser `main` et regénérer.
+
