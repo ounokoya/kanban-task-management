@@ -1,4 +1,4 @@
-# Spec — Kanban task management (v1.0.0)
+# Spec — Kanban task management (v1.0.1)
 
 > SDL-FM 1.6.0 Phase 4. Sources : analyse validée (G2) `specs/visuel/kanban-analyse.md`, maquette validée (G3) `specs/visuel/penpot/maquette.md`, tokens `specs/reference/tokens.md`, README du starter (comportements attendus), décisions dans `specs/brainstorming/2026-11-06-kanban-task-management.md`.
 > Cette spec dit **quoi** et **pourquoi**, jamais **comment**.
@@ -18,7 +18,7 @@ Un tableau de tâches à la Kanban : plusieurs tableaux, chacun fait de colonnes
 | D5 | Titre d'une tâche obligatoire ; chaque sous-tâche ajoutée aussi (« Can't be empty ») ; la description et les sous-tâches sont facultatives | README, Q-B6 |
 | D6 | Une tâche ajoutée va en bas de la colonne de son statut ; changer son statut (vue de la tâche ou formulaire) la met en bas de sa nouvelle colonne | README, Q-B13 |
 | D7 | Renommer une colonne renomme le statut de ses tâches ; retirer une colonne retire ses tâches, à l'enregistrement du tableau seulement | Q-B2, Q-B7 |
-| D8 | Supprimer un tableau (colonnes et tâches) ou une tâche (et ses sous-tâches) : après confirmation seulement | README |
+| D8 | Supprimer un tableau (colonnes et tâches) ou une tâche (et ses sous-tâches) : après confirmation seulement ; les autres tâches gardent leur ordre | README |
 | D9 | « + Add New Task » désactivé tant que le tableau ouvert n'a pas de colonne | README |
 | D10 | Couleur du point d'une colonne : `#49c4e5`, `#8471f2`, `#67e2ae`, dans cet ordre, selon la place de la colonne (4ᵉ : de nouveau `#49c4e5`) | Q-B8 |
 | D11 | Compteur d'une carte : « 1 of 3 subtasks » (sous-tâches cochées sur sous-tâches) ; d'une colonne : « Todo (4) » ; de la barre : « All boards (3) » (nombre réel, G3-2) | maquette, G3-2, Q-B12 |
@@ -122,7 +122,7 @@ Positions de la maquette (px, coin haut gauche ; à 1 px près, 2 px pour les te
 | Carte | blanche · `#2b2c37` | titre violet (`#635fc7` · `#a8a4ff`) | contour |
 | Tableau de la barre | gris (Q-A1, Q-A2) | fond violet à 10 % (clair) · blanc (sombre), texte `#635fc7` | contour |
 | Sous-tâche | fond `#f4f7fd` · `#20212c` | fond violet à 25 % | contour de la case |
-| Champ, liste Status | bordure `#828fa3` | bordure `#635fc7` | bordure `#635fc7` |
+| Champ, liste Status | bordure `#828fa3` | bordure `#635fc7` | bordure `#635fc7` épaissie d'un anneau de 1 px : un indice qui ne tient pas qu'à la couleur (v1.0.1, rapport IA K6) |
 | Champ en erreur | bordure et « Can't be empty » (ou « Used ») en rouge | | |
 
 | Événement | Effet |
@@ -149,9 +149,9 @@ Aucune transition si `prefers-reduced-motion: reduce`.
 | A4 | Cases à cocher, liste Status et interrupteur natifs ; menus faits de boutons natifs, sans rôle ARIA de menu |
 | A5 | Points des colonnes, icônes et logo décoratifs (le logo est le lien d'accueil nommé « kanban ») |
 | A6 | Contraste AA (4,5:1 ; 3:1 pour les grands textes et les bordures de champ) dans les deux thèmes, survols compris |
-| A7 | Focus visible sur chaque élément interactif ; ordre clavier = ordre de lecture |
+| A7 | Focus visible sur chaque élément interactif, jamais par la seule couleur ; ordre clavier = ordre de lecture ; chaque parcours (créer, modifier, supprimer, cocher) se fait au clavier seul |
 | A8 | Pas de transition si `prefers-reduced-motion: reduce` |
-| A9 | Changement de tableau, déplacement d'une carte (glisser ou clavier), changement de statut, sous-tâche cochée : annoncés (région de statut) |
+| A9 | Changement de tableau, déplacement d'une carte (glisser ou clavier), changement de statut, sous-tâche cochée : annoncés (région de statut) ; chaque carte décrit le déplacement au clavier (Alt + flèches) |
 | A10 | Un dialogue ou un menu fermé rend le focus à l'élément qui l'a ouvert (ouvert depuis un menu : au bouton du menu ; suppression d'une tâche annulée : à sa carte) ; après une suppression, le focus va au titre du tableau |
 
 ### Noms accessibles utilisés par les tests
@@ -162,7 +162,7 @@ Aucune transition si `prefers-reduced-motion: reduce`.
 | Barre masquée | button | « Show Sidebar » |
 | En-tête | heading (1) | nom du tableau (sous 768 px : il contient le button du même nom, qui ouvre le choix du tableau) ; button « Add New Task » ; button « Board options » (menu : buttons « Edit Board », « Delete Board ») |
 | Colonnes | heading (2) | « Todo (4) », « Doing (6) », « Done (7) » ; list ; button « + New Column » |
-| Cartes | button | son texte : « Build UI for onboarding flow 0 of 3 subtasks » |
+| Cartes | button | son texte : « Build UI for onboarding flow 0 of 3 subtasks » ; description : la consigne Alt + flèches |
 | Voir une tâche | dialog | titre de la tâche ; button « Task options » (buttons « Edit Task », « Delete Task ») ; checkbox par sous-tâche (nom : son titre) ; combobox « Current Status » |
 | Formulaire de tâche | dialog | « Add New Task » / « Edit Task » ; textbox « Title », « Description » ; group « Subtasks » : textbox « Subtask 1 »…, button « Remove subtask 1 »… ; button « + Add New Subtask » ; combobox « Status » ; button « Create Task » / « Save Changes » |
 | Formulaire de tableau | dialog | « Add New Board » / « Edit Board » ; textbox « Name » / « Board Name » ; group « Columns » / « Board Columns » : textbox « Column 1 »…, button « Remove column 1 »… ; button « + Add New Column » ; button « Create New Board » / « Save Changes » |
@@ -218,6 +218,8 @@ S32 Given chaque type de bouton, la carte, le tableau de la barre, la sous-tâch
 S33 Given prefers-reduced-motion: reduce   Then aucune transition
 S34 Given le tableau, voir une tâche, chaque formulaire, la suppression, le choix du tableau   When je parcours au Tab jusqu'au dernier élément   Then contour visible partout ; dans un dialogue, le focus reste dedans ; Échap le rend à l'élément d'origine
 S35 Given le tableau, chaque dialogue, à 375, 768 et 1440, dans les deux thèmes   Then axe-core : aucune violation sérieuse ou critique
+S38 Given le clavier seul   When je crée un tableau (refusé vide, puis accepté), j'ajoute une tâche (refusée vide, puis acceptée), je coche une sous-tâche, je modifie puis supprime une tâche après confirmation, je renomme le tableau   Then chaque résultat (titre, adresse, colonne, compteurs, données gardées) ; le focus suit
+S39 Given une carte, un champ au focus   Then la carte décrit Alt + flèches ; le champ a une bordure violette épaissie
 S36 Given le HTML servi et chaque vue rendue   Then validateur W3C Nu et html-validate (réglage FM) sans erreur ; eslint sans erreur ; gardes des règles FM (rem, aria-label, CSS logique)
 
 Visuel (G3-6, G3-7 : 5 %, références corrigées hors dépôt ; tests sautés sans design/)
@@ -234,4 +236,5 @@ U4 D7 : renommer une colonne renomme le statut de ses tâches ; retirer une colo
 U5 D12 : déplacer une tâche (même colonne, autre colonne, place donnée) ; ordre des autres gardé
 U6 D11 : compteurs « 1 of 3 subtasks », « Todo (4) » ; D10 : couleur des colonnes selon leur place
 U7 D1, D2 : forme des données gardées : data.json acceptée, chaque défaut refusé (tableau sans colonnes, tâche sans titre, statut qui n'est pas un texte, sous-tâche sans isCompleted) ; au chargement, le statut devient le nom de la colonne
+U8 D6, D8 : cocher ou décocher une sous-tâche, retirer une tâche : un nouveau tableau, l'ancien intact, l'ordre des autres gardé
 ```

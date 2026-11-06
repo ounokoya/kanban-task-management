@@ -16,6 +16,7 @@ Bonus du brief : glisser une tâche pour changer son statut et la réordonner ; 
 ## Décision
 - `pointerdown` sur une carte : glissement après 4 px à la souris, après un appui de 300 ms au tactile (sinon le tableau défile) ; la carte suit le pointeur, une place de dépôt pointillée montre la destination ; `pointerup` dépose (`moveTask`).
 - Clavier : Alt + ↑ ↓ ← → sur une carte ; annonce dans la région de statut.
+- Le contrôleur (écouteurs, appui tactile, place de dépôt, défilement près des bords) vit dans `src/lib/drag.svelte.js` ; `Board.svelte` dessine la carte qui suit et la place de dépôt (v1.0.1, rapport IA K5).
 
 ## Conséquences
 - Vérifié par S24 à S27 et U5 ; fitness function : aucune dépendance d'exécution autre que la police.

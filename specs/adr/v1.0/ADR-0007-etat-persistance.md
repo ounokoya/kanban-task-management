@@ -15,7 +15,7 @@ Les changements doivent rester après un rechargement (bonus), sans serveur ; `d
 ## Décision
 - Un état central ; chaque changement est enregistré.
 - Au chargement : données gardées vérifiées (`isBoardsData`), sinon `data.json` ; statut de chaque tâche = nom de sa colonne (`normalizeBoards`).
-- Règles pures : `addTask`, `setStatus`, `editBoard`, `moveTask`, validations.
+- Règles pures : `addTask`, `setStatus`, `editBoard`, `moveTask`, `toggleSubtask`, `removeTask`, validations ; le store applique leur résultat, sans modifier l'état autrement (v1.0.1, rapport IA K4).
 
 ## Conséquences
 - Vérifié par U3 à U7, S28, S29.
