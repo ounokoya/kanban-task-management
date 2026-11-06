@@ -27,3 +27,18 @@ Sous 9,0 : Testing (6,1) et Code Quality (8,9, tirée par Testing).
 | K8 | README (suggestion) | Pas de résumé de la réalisation avant la liste du challenge | Juste | Deux phrases en tête de l'Overview : Svelte 5, `localStorage`, glisser-déposer, thèmes, tests |
 
 Trois remarques de Testing sur trois viennent de la lecture partielle du relecteur (M46) ; je n'avais pas mis les parcours de création, modification et suppression en tête du fichier qu'il lit.
+
+## v1.0.1 en local (2026-11-06, accord de Koya : « Oui, corrige »)
+
+| # | Fait | Test |
+|---|---|---|
+| K1, K2 | Le test du menu de la tâche confirme la suppression (carte retirée, Doing (5), données gardées) ; celui du menu du tableau renomme le tableau au clavier (titre, lien marqué, adresse, focus, données) | verts d'emblée (gardes) |
+| K3 | S38 en tête d'`interactions.spec.js` : créer un tableau refusé puis accepté, ajouter une tâche refusée puis acceptée, cocher une sous-tâche, modifier puis supprimer après confirmation, au clavier seul | 3 tests, verts d'emblée (gardes) |
+| K4 | Règles pures `newBoard`, `editTask`, `toggleSubtask`, `removeTask` ; le store n'écrit plus l'état directement | U8 (rouge avant : règles absentes) |
+| K5 | Contrôleur du glisser-déposer dans `src/lib/drag.svelte.js` | S24 à S26 inchangés, verts |
+| K6 | Focus des champs dans l'utilitaire `field` : bordure violette et anneau de 1 px. **Défaut trouvé par le test** : la règle de la couche `base` perdait contre `field`, la bordure restait grise au clavier | S39 (rouge avant) |
+| K7 | Consigne cachée « Alt + arrow keys… » liée à chaque carte (`aria-describedby`) | S39 (rouge avant) |
+| K8 | README : résumé de la réalisation en tête, 121 tests, S38 et S39 dans la table | — |
+
+**121 / 121** (8 unitaires, 113 Playwright) ; tag `v1.0.1` local ; en attente de l'accord de publication, puis de « Regenerate report ».
+
