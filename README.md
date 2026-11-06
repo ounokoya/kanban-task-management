@@ -20,7 +20,7 @@ This is a solution to the [Kanban task management web app challenge on Frontend 
 
 ## Overview
 
-A Kanban board built with Svelte 5 and Tailwind CSS v4: boards, columns, tasks and subtasks kept in `localStorage`, cards moved by drag and drop with the mouse, touch or keyboard, light and dark themes, from 320 px to desktop. Every flow can be done with the keyboard alone, and 121 tests, written from a spec of the Figma file, check it.
+A Kanban board built with Svelte 5 and Tailwind CSS v4: boards, columns, tasks and subtasks kept in `localStorage`, cards moved by drag and drop with the mouse, touch or keyboard, light and dark themes, from 320 px to desktop. Every flow can be done with the keyboard alone, and 124 tests, written from a spec of the Figma file, check it.
 
 ### The challenge
 
@@ -81,17 +81,18 @@ Before any code, the design was analysed and rebuilt:
 
 ### Tests
 
-121 tests derived from the spec, at two levels:
+124 tests derived from the spec, at two levels:
 
 - **8 unit tests** of the pure business rules (U1–U8) with Node's built-in test runner, no browser: `npm run test:unit` → [`tests/unit/`](./tests/unit/)
-- **113 Playwright tests** of every user flow (S1–S39), on the build (`npm test` runs both levels) and on the live site (`BASE_URL=https://ounokoya.github.io/kanban-task-management/ npx playwright test`)
+- **116 Playwright tests** of every user flow (S1–S40), on the build (`npm test` runs both levels) and on the live site (`BASE_URL=https://ounokoya.github.io/kanban-task-management/ npx playwright test`)
 
 Where each rule and each user flow is tested:
 
 | What users can do | Scenarios | File |
 |---|---|---|
-| With the keyboard alone: create a board (refused empty, then accepted), add a task (refused empty, then accepted), check a subtask, edit then delete a task after confirmation, rename the board; each result checked on screen and in storage | S38 | [`interactions.spec.js`](./tests/interactions.spec.js) |
+| With the keyboard alone: create a board (refused empty, then accepted), add a task (refused empty, then accepted), check a subtask, edit then delete a task after confirmation, rename the board, delete the board after confirmation; each result checked on screen and in storage | S38 | [`interactions.spec.js`](./tests/interactions.spec.js) |
 | Toggle the theme with the mouse, then the keyboard, both ways, kept after a reload; move a card with Alt + arrow keys; hide and show the sidebar; open the board and task menus | S30, S27, S10 | [`interactions.spec.js`](./tests/interactions.spec.js) |
+| On a phone: no sidebar, pick a board, add a task with « + », change its status, columns scroll and the page does not; on a tablet: hide the sidebar, add a task, show it again | S40 | [`interactions.spec.js`](./tests/interactions.spec.js) |
 | Cards describe Alt + arrow keys; focused fields get a thicker border, not only a colour | S39 | [`interactions.spec.js`](./tests/interactions.spec.js) |
 | Hover states (light and dark, the dark theme chosen with the switch), reduced motion, keyboard to the last element, focus kept in dialogs and given back | S32–S34 | [`interactions.spec.js`](./tests/interactions.spec.js) |
 | See the right layout at 375, 768 and 1440 px, with the sidebar hidden, dialogs centred, and no horizontal page scroll from 320 px | S1–S6 | [`layout.spec.js`](./tests/layout.spec.js) |
