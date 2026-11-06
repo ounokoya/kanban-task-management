@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { boardSlug, validateBoard, validateTask, addTask, setStatus, editBoard, moveTask, toggleSubtask, removeTask, subtaskLabel, columnLabel, columnColor, isBoardsData, normalizeBoards } from '../../src/lib/rules.js'
+import { boardSlug, validateBoard, validateTask, addTask, setStatus, editBoard, moveTask, newBoard, editTask, toggleSubtask, removeTask, subtaskLabel, columnLabel, columnColor, isBoardsData, normalizeBoards } from '../../src/lib/rules.js'
 
 // Spec §8 — U1 à U7 : règles de gestion (§2) sans navigateur
 
@@ -85,8 +85,17 @@ test('U7 — données gardées : data.json acceptée, chaque défaut refusé ; a
   assert.equal(DATA.boards[1].columns[0].tasks[1].status, '', 'data.json lui-même n\'est pas modifié')
 })
 
-test('U8 — cocher ou décocher une sous-tâche, retirer une tâche : un nouveau tableau, l\'ancien intact, l\'ordre gardé (D6, D8)', () => {
+test('U8 — créer un tableau, modifier une tâche, cocher ou décocher une sous-tâche, retirer une tâche : un nouveau tableau, l\'ancien intact, l\'ordre gardé (D4, D6, D8)', () => {
+  assert.deepEqual(newBoard({ name: ' Web Design ', columns: ['Todo', ' Doing '] }), { name: 'Web Design', columns: [{ name: 'Todo', tasks: [] }, { name: 'Doing', tasks: [] }] })
   const before = PL()
+  const auth = before.columns[1].tasks[4]
+  const renamed = editTask(before, { column: 1, index: 4 }, { ...auth, title: 'Auth endpoints', status: 'Doing' })
+  assert.equal(renamed.columns[1].tasks[4].title, 'Auth endpoints', 'même statut : la tâche garde sa place')
+  assert.equal(renamed.columns[1].tasks[4].status, 'Doing')
+  const done = editTask(before, { column: 1, index: 4 }, { ...auth, title: 'Auth endpoints', status: 'Done' })
+  assert.deepEqual(done.columns[2].tasks.at(-1), { ...auth, title: 'Auth endpoints', status: 'Done' }, 'nouveau statut : en bas de sa nouvelle colonne')
+  assert.equal(done.columns[1].tasks.length, 5)
+  assert.equal(before.columns[1].tasks[4].title, auth.title, 'l\'ancien tableau est intact')
   const checked = toggleSubtask(before, { column: 1, index: 5 }, 1, true)
   assert.equal(checked.columns[1].tasks[5].subtasks[1].isCompleted, true)
   assert.equal(subtaskLabel(checked.columns[1].tasks[5]), '2 of 3 subtasks')

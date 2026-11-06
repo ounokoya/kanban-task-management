@@ -236,5 +236,5 @@ U4 D7 : renommer une colonne renomme le statut de ses tâches ; retirer une colo
 U5 D12 : déplacer une tâche (même colonne, autre colonne, place donnée) ; ordre des autres gardé
 U6 D11 : compteurs « 1 of 3 subtasks », « Todo (4) » ; D10 : couleur des colonnes selon leur place
 U7 D1, D2 : forme des données gardées : data.json acceptée, chaque défaut refusé (tableau sans colonnes, tâche sans titre, statut qui n'est pas un texte, sous-tâche sans isCompleted) ; au chargement, le statut devient le nom de la colonne
-U8 D6, D8 : cocher ou décocher une sous-tâche, retirer une tâche : un nouveau tableau, l'ancien intact, l'ordre des autres gardé
+U8 D4, D6, D8 : créer un tableau, modifier une tâche (à sa place, ou en bas de sa nouvelle colonne), cocher ou décocher une sous-tâche, retirer une tâche : un nouveau tableau, l'ancien intact, l'ordre des autres gardé
 ```

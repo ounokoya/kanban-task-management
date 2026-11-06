@@ -37,6 +37,10 @@ export function validateTask({ title, subtasks }) {
 }
 
 const withColumns = (board, update) => ({ ...board, columns: board.columns.map((column, i) => update(column, i)) })
+const withTask = (board, { column, index }, task) => withColumns(board, (c, i) => (i === column ? { ...c, tasks: c.tasks.map((t, j) => (j === index ? task : t)) } : c))
+
+// D4 : un nouveau tableau, ses colonnes vides
+export const newBoard = ({ name, columns }) => ({ name: name.trim(), columns: columns.map((column) => ({ name: column.trim(), tasks: [] })) })
 
 // D6 : une tâche ajoutée va en bas de la colonne de son statut
 export function addTask(board, task) {
@@ -48,6 +52,27 @@ export function setStatus(board, { column, index }, status) {
   const to = board.columns.findIndex((c) => c.name === status)
   if (to < 0 || to === column) return board
   return moveTask(board, { column, index }, { column: to, index: board.columns[to].tasks.length })
+}
+
+// D6 : une tâche modifiée garde sa place ; un nouveau statut la met en bas de sa nouvelle colonne
+export function editTask(board, { column, index }, task) {
+  const current = board.columns[column]
+  if (!current?.tasks[index]) return board
+  const kept = withTask(board, { column, index }, { ...task, status: current.name })
+  return task.status === current.name ? kept : setStatus(kept, { column, index }, task.status)
+}
+
+// D11 : une sous-tâche cochée ou décochée
+export function toggleSubtask(board, { column, index }, s, done) {
+  const task = board.columns[column]?.tasks[index]
+  if (!task?.subtasks[s]) return board
+  return withTask(board, { column, index }, { ...task, subtasks: task.subtasks.map((subtask, i) => (i === s ? { ...subtask, isCompleted: done } : subtask)) })
+}
+
+// D8 : la tâche retirée, les autres gardent leur ordre
+export function removeTask(board, { column, index }) {
+  if (!board.columns[column]?.tasks[index]) return board
+  return withColumns(board, (c, i) => (i === column ? { ...c, tasks: c.tasks.filter((_, t) => t !== index) } : c))
 }
 
 // D12 : la tâche quitte sa place et prend celle donnée (bornée) ; son statut devient le nom de la colonne

@@ -1,6 +1,7 @@
-// État des tableaux et persistance dans le navigateur (ADR-0007, D2) ; chaque changement passe par une règle pure
+// État des tableaux et persistance dans le navigateur (ADR-0007, D2) ; chaque changement passe par une règle pure :
+// le store remplace le tableau (ou la liste) par celui que la règle rend, puis enregistre
 import data from '../../data.json'
-import { isBoardsData, normalizeBoards, boardSlug, addTask, setStatus, editBoard, moveTask } from './rules.js'
+import { isBoardsData, normalizeBoards, boardSlug, newBoard, addTask, setStatus, editBoard, editTask, moveTask, toggleSubtask as checkSubtask, removeTask } from './rules.js'
 
 const KEY = 'kanban/boards'
 
@@ -28,34 +29,24 @@ export function slugs() {
   return taken
 }
 
-export function createBoard({ name, columns }) {
-  store.boards.push({ name: name.trim(), columns: columns.map((column) => ({ name: column.trim(), tasks: [] })) })
+export function createBoard(data) {
+  store.boards = [...store.boards, newBoard(data)]
   save()
   return store.boards.length - 1
 }
 export const updateBoard = (i, edit) => commit(i, editBoard(plain(i), edit))
-export function deleteBoard(i) { store.boards.splice(i, 1); save() }
+export function deleteBoard(i) {
+  store.boards = store.boards.filter((_, j) => j !== i)
+  save()
+}
 
 export const createTask = (i, task) => commit(i, addTask(plain(i), task))
 export const changeStatus = (i, at, status) => commit(i, setStatus(plain(i), at, status))
 export const move = (i, from, to) => commit(i, moveTask(plain(i), from, to))
 
-// Modifier une tâche : texte et sous-tâches à sa place ; nouveau statut : en bas de sa nouvelle colonne (D6)
-export function updateTask(i, { column, index }, task) {
-  const board = plain(i)
-  board.columns[column].tasks[index] = { ...task, status: board.columns[column].name }
-  commit(i, task.status === board.columns[column].name ? board : setStatus(board, { column, index }, task.status))
-}
-
-export function toggleSubtask(i, { column, index }, s, done) {
-  store.boards[i].columns[column].tasks[index].subtasks[s].isCompleted = done
-  save()
-}
-
-export function deleteTask(i, { column, index }) {
-  store.boards[i].columns[column].tasks.splice(index, 1)
-  save()
-}
+export const updateTask = (i, at, task) => commit(i, editTask(plain(i), at, task))
+export const toggleSubtask = (i, at, s, done) => commit(i, checkSubtask(plain(i), at, s, done))
+export const deleteTask = (i, at) => commit(i, removeTask(plain(i), at))
 
 // Place d'une tâche après un changement de statut : en bas de sa nouvelle colonne
 export function lastOf(i, status) {
