@@ -218,8 +218,9 @@ S32 Given chaque type de bouton, la carte, le tableau de la barre, la sous-tâch
 S33 Given prefers-reduced-motion: reduce   Then aucune transition
 S34 Given le tableau, voir une tâche, chaque formulaire, la suppression, le choix du tableau   When je parcours au Tab jusqu'au dernier élément   Then contour visible partout ; dans un dialogue, le focus reste dedans ; Échap le rend à l'élément d'origine
 S35 Given le tableau, chaque dialogue, à 375, 768 et 1440, dans les deux thèmes   Then axe-core : aucune violation sérieuse ou critique
-S38 Given le clavier seul   When je crée un tableau (refusé vide, puis accepté), j'ajoute une tâche (refusée vide, puis acceptée), je coche une sous-tâche, je modifie puis supprime une tâche après confirmation, je renomme le tableau   Then chaque résultat (titre, adresse, colonne, compteurs, données gardées) ; le focus suit
+S38 Given le clavier seul   When je crée un tableau (refusé vide, puis accepté), j'ajoute une tâche (refusée vide, puis acceptée), je coche une sous-tâche, je modifie puis supprime une tâche après confirmation, je renomme le tableau, je supprime le tableau après confirmation   Then chaque résultat (titre, adresse, colonne, compteurs, données gardées) ; le focus suit
 S39 Given une carte, un champ au focus   Then la carte décrit Alt + flèches ; le champ a une bordure violette épaissie
+S40 Given 375 px   When je choisis Roadmap, j'ajoute une tâche par « + », je change son statut   Then pas de barre latérale, la tâche à sa place, les colonnes côte à côte défilent, la page non ; Given 768 px   When je masque la barre, ajoute une tâche, montre la barre   Then barre de 261 px, colonnes à 24 px sans elle, la tâche ajoutée
 S36 Given le HTML servi et chaque vue rendue   Then validateur W3C Nu et html-validate (réglage FM) sans erreur ; eslint sans erreur ; gardes des règles FM (rem, aria-label, CSS logique)
 
 Visuel (G3-6, G3-7 : 5 %, références corrigées hors dépôt ; tests sautés sans design/)

@@ -42,3 +42,20 @@ Trois remarques de Testing sur trois viennent de la lecture partielle du relecte
 
 **121 / 121** (8 unitaires, 113 Playwright) ; tag `v1.0.1` local ; en attente de l'accord de publication, puis de « Regenerate report ».
 
+## Rapport regénéré sur la v1.0.1 (accord de Koya : « Oui, publie et regénère »)
+
+v1.0.1 publiée (`main`, tag `v1.0.1`, `gh-pages`), **113 / 113 en ligne**. Rapport regénéré : **9,6 / 10**.
+
+| Partie | Note |
+|---|---|
+| Code Quality | 9,5 : Best Practices 9,5 · File Organization 9,7 · Architecture 9,6 · Testing **8,7** (était 6,1) |
+| Design & UX | 9,8 : Accessibility 9,8 (était 9,4) |
+| Documentation | 9,8 : README 9,9 · Commits 9,7 |
+
+Sous 9,0 : Testing seul. Les autres parties n'ont plus que des points forts.
+
+| # | Partie | Remarque FM | Verdict | Proposition |
+|---|---|---|---|---|
+| L1 | Testing (« needs attention ») | Le survol en sombre ouvre la suppression d'un tableau sans la confirmer (`interactions.spec.js:270`) | **Faux positif sur le fond** : S14 et S16 (`boards.spec.js`) suppriment après confirmation ; absent d'`interactions.spec.js` (M52) | S38 : supprimer un tableau au clavier seul (Cancel, puis Delete : tableau, lien et données retirés, Marketing Plan ouvert, focus sur son titre) ; le survol en sombre confirme la suppression |
+| L2 | Testing (« needs attention ») | Tous les scénarios ouvrent l'app à 1440 px | **Faux positif sur le fond** : S1 à S6 (`layout.spec.js`), S9, S26 et S35 testent 375 et 768 px ; mais `interactions.spec.js` reste à 1440 | S40 en tête d'`interactions.spec.js` : à 375 px, choisir un tableau, ajouter une tâche par « + », changer son statut, colonnes qui défilent ; à 768 px, barre masquée puis montrée, tâche ajoutée |
+
