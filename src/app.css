@@ -1,0 +1,205 @@
+/* Plus Jakarta Sans servie avec le site, sous-ensemble latin (ADR-0005) */
+@import "@fontsource/plus-jakarta-sans/latin-500.css";
+@import "@fontsource/plus-jakarta-sans/latin-700.css";
+@import "tailwindcss";
+
+/* Le thème suit l'attribut posé sur <html> (ADR-0004) */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Tokens du .fig (specs/reference/tokens.md) et teintes AA validées (G2 Q-A1 à Q-A8, G3-1 ; scripts/fig/aa.py) */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000112;
+  --color-violet: #635fc7;
+  --color-violet-hover: #534ec1;
+  --color-violet-light: #a8a4ff;
+  --color-red: #e42828;
+  --color-red-hover: #cc1a1a;
+  --color-grey: #828fa3;
+  --color-todo: #49c4e5;
+  --color-doing: #8471f2;
+  --color-done: #67e2ae;
+
+  /* rôles : valeurs du thème clair, redéfinies pour le sombre plus bas */
+  --color-board: var(--board);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-text: var(--secondary-text);
+  --color-secondary-text-hover: var(--secondary-text-hover);
+  --color-danger-text: var(--danger-text);
+  --color-done-text: var(--done-text);
+  --color-hint: var(--hint);
+  --color-subtask: var(--subtask);
+  --color-subtask-hover: var(--subtask-hover);
+  --color-nav-hover: var(--nav-hover);
+  --color-nav-hover-text: var(--nav-hover-text);
+  --color-menu: var(--menu);
+  --color-new-column: var(--new-column);
+
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.875rem;
+  --text-title-md: 1.25rem;
+  --text-title-md--line-height: 1.5625rem;
+  --text-l: 1.125rem;
+  --text-l--line-height: 1.4375rem;
+  --text-m: 0.9375rem;
+  --text-m--line-height: 1.1875rem;
+  --text-s: 0.75rem;
+  --text-s--line-height: 0.9375rem;
+  --text-s--letter-spacing: 0.15rem;
+  --text-body: 0.8125rem;
+  --text-body--line-height: 1.4375rem;
+  --text-body-m: 0.75rem;
+  --text-body-m--line-height: 0.9375rem;
+
+  --radius-card: 0.5rem;
+  --radius-box: 0.375rem;
+  --radius-field: 0.25rem;
+
+  --shadow-card: 0 0.25rem 0.375rem rgb(54 78 126 / 0.1);
+  --shadow-menu: 0 0.625rem 1.25rem rgb(54 78 126 / 0.25);
+}
+
+/* point de rupture unique (768 px) : variantes md: et @variant md des composants, lu aussi par src/lib/media.svelte.js */
+@theme static {
+  --breakpoint-md: 48rem;
+}
+
+/* voile des dialogues : valeur écrite dans la règle produite (::backdrop) */
+@theme inline {
+  --color-scrim: rgb(0 0 0 / 0.5);
+}
+
+:root {
+  --board: #f4f7fd;
+  --surface: #ffffff;
+  --line: #e4ebfa;
+  --ink: #000112;
+  --muted: #647288;
+  --accent: #635fc7;
+  --secondary: rgb(99 95 199 / 0.1);
+  --secondary-hover: rgb(99 95 199 / 0.25);
+  --secondary-text: #635fc7;
+  --secondary-text-hover: #5450c2;
+  --danger-text: #e42828;
+  --done-text: #5e5f69;
+  --hint: #75757f;
+  --subtask: #f4f7fd;
+  --subtask-hover: rgb(99 95 199 / 0.25);
+  --nav-hover: rgb(99 95 199 / 0.1);
+  --nav-hover-text: #635fc7;
+  --menu: #ffffff;
+  --new-column: #e9effa;
+  --focus: #635fc7;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --board: #20212c;
+  --surface: #2b2c37;
+  --line: #3e3f4e;
+  --ink: #ffffff;
+  --muted: #8894a7;
+  --accent: #a8a4ff;
+  --secondary: #ffffff;
+  --secondary-hover: #ffffff;
+  --secondary-text: #635fc7;
+  --secondary-text-hover: #635fc7;
+  --danger-text: #ed6a6a;
+  --done-text: #a5a6aa;
+  --hint: #92939b;
+  --subtask: #20212c;
+  --subtask-hover: #39395b;
+  --nav-hover: #ffffff;
+  --nav-hover-text: #635fc7;
+  --menu: #20212c;
+  --new-column: #2b2c37;
+  --focus: #a8a4ff;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    background-color: var(--board);
+  }
+
+  body {
+    @apply bg-board font-sans text-ink antialiased;
+  }
+
+  /* focus clavier : contour de 2 px décalé de 2 px (G3-3, Q-B16) */
+  :focus-visible {
+    outline: 0.125rem solid var(--focus);
+    outline-offset: 0.125rem;
+  }
+
+  /* titre focalisé par le script après une suppression (A10) : pas un élément interactif */
+  h1[tabindex="-1"]:focus {
+    outline: none;
+  }
+
+  input:not([type="checkbox"]):focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    border-color: var(--color-violet);
+  }
+}
+
+/* composants réutilisés (utilitaires Tailwind : utilisables dans le balisage et avec @apply) */
+@utility btn {
+  @apply inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full font-bold;
+  transition-property: color, background-color, opacity;
+  transition-duration: 150ms;
+}
+
+@utility btn-primary {
+  @apply btn h-10 bg-violet text-body text-white hover:bg-violet-hover disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:bg-violet;
+}
+
+@utility btn-primary-l {
+  @apply btn h-12 bg-violet text-m text-white hover:bg-violet-hover disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:bg-violet;
+}
+
+@utility btn-secondary {
+  @apply btn h-10 bg-secondary text-body text-secondary-text hover:bg-secondary-hover hover:text-secondary-text-hover;
+}
+
+@utility btn-danger {
+  @apply btn h-10 bg-red text-body text-white hover:bg-red-hover;
+}
+
+/* hauteur et marges intérieures dans le balisage (champ, zone de texte, liste) */
+@utility field {
+  @apply w-full rounded-field border border-grey bg-surface text-body font-medium text-ink placeholder:text-hint;
+  transition-property: border-color;
+  transition-duration: 150ms;
+
+  &:hover {
+    border-color: var(--color-violet);
+  }
+
+  &[aria-invalid="true"] {
+    border-color: var(--color-red);
+  }
+}
+
+@utility label {
+  @apply mb-2 block text-body-m font-bold text-muted dark:text-white;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    transition: none !important;
+  }
+}

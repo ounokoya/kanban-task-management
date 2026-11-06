@@ -59,11 +59,11 @@ test('U5 — déplacer une tâche : même colonne, autre colonne, place donnée 
   assert.equal(end.columns[0].tasks.at(-1).status, 'Todo')
 })
 
-test('U6 — compteurs « 1 of 3 subtasks », « Todo (4) » ; couleur des colonnes selon leur place (D10, D11)', () => {
+test('U6 — compteurs « 1 of 3 subtasks », « Todo (4) » ; couleur des colonnes selon leur place, par token (D10, D11)', () => {
   assert.equal(subtaskLabel(PL().columns[1].tasks[0]), '2 of 3 subtasks')
   assert.equal(subtaskLabel({ subtasks: [] }), '0 of 0 subtasks')
   assert.equal(columnLabel(PL().columns[0]), 'Todo (4)')
-  assert.deepEqual([0, 1, 2, 3, 4].map(columnColor), ['#49c4e5', '#8471f2', '#67e2ae', '#49c4e5', '#8471f2'])
+  assert.deepEqual([0, 1, 2, 3, 4].map(columnColor), ['todo', 'doing', 'done', 'todo', 'doing'], 'valeurs des tokens vérifiées dans le navigateur (S7)')
 })
 
 test('U7 — données gardées : data.json acceptée, chaque défaut refusé ; au chargement, le statut devient le nom de la colonne (D1, D2)', () => {
@@ -82,5 +82,5 @@ test('U7 — données gardées : data.json acceptée, chaque défaut refusé ; a
   for (const [what, data] of Object.entries(cases)) assert.equal(isBoardsData(data), false, what)
   const normal = normalizeBoards(DATA)
   for (const b of normal.boards) for (const c of b.columns) for (const t of c.tasks) assert.equal(t.status, c.name, `${b.name} · ${t.title}`)
-  assert.equal(DATA.boards[1].columns[0].tasks[0].status, '', 'data.json lui-même n\'est pas modifié')
+  assert.equal(DATA.boards[1].columns[0].tasks[1].status, '', 'data.json lui-même n\'est pas modifié')
 })
