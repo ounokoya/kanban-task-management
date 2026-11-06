@@ -20,6 +20,8 @@ This is a solution to the [Kanban task management web app challenge on Frontend 
 
 ## Overview
 
+A Kanban board built with Svelte 5 and Tailwind CSS v4: boards, columns, tasks and subtasks kept in `localStorage`, cards moved by drag and drop with the mouse, touch or keyboard, light and dark themes, from 320 px to desktop. Every flow can be done with the keyboard alone, and 121 tests, written from a spec of the Figma file, check it.
+
 ### The challenge
 
 Users should be able to:
@@ -73,22 +75,24 @@ Before any code, the design was analysed and rebuilt:
 1. **Figma file read without Figma** — the `.fig` file was decoded with a small script (`scripts/fig/`): exact positions, sizes, colours, gradients and letter spacing, and reference images of 73 screens rendered from the file's own geometry, also in AA-corrected colours. The premium design files stay out of the repository (ADR-0010).
 2. **Visual analysis in Excalidraw** — screens, interactive elements, design inconsistencies and a contrast audit of both themes → [`specs/visuel/`](./specs/visuel/)
 3. **Penpot mockup** — library, components with their hover and focus states, key screens → [`specs/visuel/penpot/`](./specs/visuel/penpot/)
-4. **Spec, then tests** — 37 Given/When/Then scenarios, 7 business rules and the accessible names the tests rely on → [`specs/specifications/`](./specs/specifications/); the tests were written before the code
+4. **Spec, then tests** — 39 Given/When/Then scenarios, 8 business rules and the accessible names the tests rely on → [`specs/specifications/`](./specs/specifications/); the tests were written before the code
 5. **Decisions** — Svelte, tokens and themes, font, routing, persistence, dialogs, drag and drop, publication → [`specs/adr/`](./specs/adr/)
 6. **Code** — one commit per part (base, board, dialogs, assembly), then a walk-through in a real browser from 320 to 1440 px → [`specs/analyse/`](./specs/analyse/)
 
 ### Tests
 
-116 tests derived from the spec, at two levels:
+121 tests derived from the spec, at two levels:
 
-- **7 unit tests** of the pure business rules (U1–U7) with Node's built-in test runner, no browser: `npm run test:unit` → [`tests/unit/`](./tests/unit/)
-- **109 Playwright tests** of every user flow (S1–S37), on the build (`npm test` runs both levels) and on the live site (`BASE_URL=https://ounokoya.github.io/kanban-task-management/ npx playwright test`)
+- **8 unit tests** of the pure business rules (U1–U8) with Node's built-in test runner, no browser: `npm run test:unit` → [`tests/unit/`](./tests/unit/)
+- **113 Playwright tests** of every user flow (S1–S39), on the build (`npm test` runs both levels) and on the live site (`BASE_URL=https://ounokoya.github.io/kanban-task-management/ npx playwright test`)
 
 Where each rule and each user flow is tested:
 
 | What users can do | Scenarios | File |
 |---|---|---|
+| With the keyboard alone: create a board (refused empty, then accepted), add a task (refused empty, then accepted), check a subtask, edit then delete a task after confirmation, rename the board; each result checked on screen and in storage | S38 | [`interactions.spec.js`](./tests/interactions.spec.js) |
 | Toggle the theme with the mouse, then the keyboard, both ways, kept after a reload; move a card with Alt + arrow keys; hide and show the sidebar; open the board and task menus | S30, S27, S10 | [`interactions.spec.js`](./tests/interactions.spec.js) |
+| Cards describe Alt + arrow keys; focused fields get a thicker border, not only a colour | S39 | [`interactions.spec.js`](./tests/interactions.spec.js) |
 | Hover states (light and dark, the dark theme chosen with the switch), reduced motion, keyboard to the last element, focus kept in dialogs and given back | S32–S34 | [`interactions.spec.js`](./tests/interactions.spec.js) |
 | See the right layout at 375, 768 and 1440 px, with the sidebar hidden, dialogs centred, and no horizontal page scroll from 320 px | S1–S6 | [`layout.spec.js`](./tests/layout.spec.js) |
 | See the 3 boards of `data.json`, switch boards (address, title, announcement, Back, reload), pick a board on mobile | S7–S9 | [`boards.spec.js`](./tests/boards.spec.js) |
@@ -98,7 +102,7 @@ Where each rule and each user flow is tested:
 | Keep every change after a reload (invalid saved data falls back to `data.json`); colours of both themes | S28, S29, S31 | [`persistence.spec.js`](./tests/persistence.spec.js) |
 | axe-core in every view, size and theme; landmarks; W3C Nu, html-validate and ESLint | S35, S36 | [`accessibility.spec.js`](./tests/accessibility.spec.js), [`static.spec.js`](./tests/static.spec.js) |
 | 24 screens compared with images rendered from the Figma file | S37 | [`visual.spec.js`](./tests/visual.spec.js) |
-| Business rules without a browser: board addresses, every validation message, adding tasks and changing their status, editing a board, moving tasks, counters and colours, saved-data checks | U1–U7 | [`rules.test.js`](./tests/unit/rules.test.js) |
+| Business rules without a browser: board addresses, every validation message, adding tasks and changing their status, editing a board, moving tasks, counters and colours, saved-data checks, creating a board, editing a task, checking a subtask, deleting a task | U1–U8 | [`rules.test.js`](./tests/unit/rules.test.js) |
 | Architecture rules: colours only in the tokens, nothing loaded from other domains, no drag-and-drop library, no design file in the repository | ADR-0004, 0005, 0009, 0010 | [`fitness.spec.js`](./tests/fitness.spec.js) |
 
 ### What I learned
@@ -138,7 +142,7 @@ export function moveTask(board, from, to) {
 ### Continued development
 
 - **Design inconsistencies.** The counters follow `data.json`, not the mockup ("Design settings and search pages": 1 of 3 in the mockup, 2 of 3 in the data). Four tasks of `data.json` have an empty status: a task's status is the name of the column that holds it. The mobile "View Task" screen shows a different third subtask than the desktop one. The mockup's "substasks" reads "subtasks".
-- **Accessibility.** Text under 4.5:1 uses the nearest AA shade of the same hue: secondary text `#828fa3` → `#647288` (light) and `#8894a7` (dark), violet text on dark backgrounds `#a8a4ff`, red text on dark `#ed6a6a`, completed subtasks `#5e5f69` / `#a5a6aa`, placeholders `#75757f` / `#92939b`, hover colours of the violet and red buttons darkened for white text; field borders are drawn at full `#828fa3` (3:1). Every control has a 2 px focus outline; dialogs give focus back to the element that opened them; switching boards, moving a card, changing a status and checking a subtask are announced.
+- **Accessibility.** Text under 4.5:1 uses the nearest AA shade of the same hue: secondary text `#828fa3` → `#647288` (light) and `#8894a7` (dark), violet text on dark backgrounds `#a8a4ff`, red text on dark `#ed6a6a`, completed subtasks `#5e5f69` / `#a5a6aa`, placeholders `#75757f` / `#92939b`, hover colours of the violet and red buttons darkened for white text; field borders are drawn at full `#828fa3` (3:1). Every control has a 2 px focus outline; dialogs give focus back to the element that opened them; switching boards, moving a card, changing a status and checking a subtask are announced. After Frontend Mentor's report (v1.0.1), focused fields get a thicker violet border rather than a colour change alone, and each card describes the Alt + arrow keys to screen readers.
 - **Visual comparison with the Figma file.** Screenshots of 24 screens differ from the reference images by 0.7–4.7 % (threshold 5 %), mostly text antialiasing and a few line breaks between Figma's glyph outlines and Chromium.
 - **Next steps.** Reorder columns by dragging, an undo after a deletion, and a back end so the boards follow the user from one device to another.
 
