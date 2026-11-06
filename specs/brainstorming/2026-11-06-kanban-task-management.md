@@ -46,3 +46,7 @@ Koya : « Je valide (G1) » (schéma sur le canevas partagé, zone x 118 000). *
 ## Analyse validée (G2, 2026-11-06)
 
 Koya : « Je valide (G2) ». Analyse : `specs/visuel/kanban-analyse.md` et `.png` (canevas x 120 200). **Toutes les propositions sont retenues** : Q-A1 à Q-A8 (gris `#647288` en clair et `#8894a7` en sombre ; rouge `#e42828`, texte rouge `#ed6a6a` en sombre ; violet `#a8a4ff` en sombre ; sous-tâche cochée `#5e5f69` (`#a5a6aa` au survol en sombre) ; textes d'exemple `#75757f` et `#92939b` ; survols plus foncés `#534ec1` et `#cc1a1a`, texte de Cancel survolé `#5450c2` ; bordures des champs `#828fa3`) et Q-B1 à Q-B16 (adresse par ancre, identifiants et statut lié au nom de colonne, `dialog` modal, menus et liste Status natifs, validation « Can't be empty » et « Used », colonne retirée à l'enregistrement, couleurs des colonnes, glisser-déposer souris, tactile et clavier, préférences gardées, écran sans tableau, « subtasks », tâche en bas de colonne, défilement du tableau seul, données vérifiées, focus 2 px).
+
+## Maquette validée (G3, 2026-11-06)
+
+Koya : « Je valide (G3) ». Maquette : `specs/visuel/penpot/maquette.md` (fichier Penpot « kanban-task-management »). **Tous les points sont retenus** : G3-1 (Q-A4 et Q-A7 étendus aux survols), G3-2 (compteur réel, « subtasks »), G3-3 (focus), G3-4 (carte glissée et place de dépôt), G3-5 (coche du starter), G3-6 (24 écrans comparés), G3-7 (seuil 5 %), G3-8 (Plus Jakarta Sans par Fontsource au verrou).
