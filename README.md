@@ -48,6 +48,7 @@ Users should be able to:
 
 ### Links
 
+- Solution URL: [frontendmentor.io/solutions/kanban-board-with-svelte-5-tailwind-v4-pointer-event-drag-and-drop--muvWE8uyd](https://www.frontendmentor.io/solutions/kanban-board-with-svelte-5-tailwind-v4-pointer-event-drag-and-drop--muvWE8uyd)
 - Live Site URL: [ounokoya.github.io/kanban-task-management](https://ounokoya.github.io/kanban-task-management/)
 - Repository: [github.com/ounokoya/kanban-task-management](https://github.com/ounokoya/kanban-task-management)
 
