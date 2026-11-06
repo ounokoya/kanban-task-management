@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="/kanban-task-management/assets/favicon-32x32-DQjEQYWa.png">
+    <title>Kanban task management</title>
+    <meta name="description" content="Kanban task manager: boards, columns, tasks and subtasks, drag and drop, light and dark themes.">
+    <!-- thème posé avant le premier affichage : choix gardé, sinon celui de l'appareil (ADR-0004) -->
+    <script>
+      try {
+        const saved = localStorage.getItem('kanban/theme')
+        document.documentElement.dataset.theme = saved === 'dark' || saved === 'light' ? saved : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      } catch {
+        document.documentElement.dataset.theme = 'light'
+      }
+    </script>
+    <script type="module" crossorigin src="/kanban-task-management/assets/index-BGr3eoh-.js"></script>
+    <link rel="stylesheet" crossorigin href="/kanban-task-management/assets/index-YKwND6Bq.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>This task board needs JavaScript.</noscript>
+  </body>
+</html>
