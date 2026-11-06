@@ -42,3 +42,7 @@ Koya : « Je valide (G1) » (schéma sur le canevas partagé, zone x 118 000). *
 | 4-5 | Spec, tests au rouge (unitaires et parcours), ADR ; verrou (accord) |
 | 6-10 | Code par parties, tests, parcours réel (320 à 1440 px, clavier, tactile), README (une capture par état) |
 | 11-13 | Dépôt public `kanban-task-management`, `gh-pages`, soumission FM (accord) ; rapport IA corrigé jusqu'à 9,0 au moins sur chaque note |
+
+## Analyse validée (G2, 2026-11-06)
+
+Koya : « Je valide (G2) ». Analyse : `specs/visuel/kanban-analyse.md` et `.png` (canevas x 120 200). **Toutes les propositions sont retenues** : Q-A1 à Q-A8 (gris `#647288` en clair et `#8894a7` en sombre ; rouge `#e42828`, texte rouge `#ed6a6a` en sombre ; violet `#a8a4ff` en sombre ; sous-tâche cochée `#5e5f69` (`#a5a6aa` au survol en sombre) ; textes d'exemple `#75757f` et `#92939b` ; survols plus foncés `#534ec1` et `#cc1a1a`, texte de Cancel survolé `#5450c2` ; bordures des champs `#828fa3`) et Q-B1 à Q-B16 (adresse par ancre, identifiants et statut lié au nom de colonne, `dialog` modal, menus et liste Status natifs, validation « Can't be empty » et « Used », colonne retirée à l'enregistrement, couleurs des colonnes, glisser-déposer souris, tactile et clavier, préférences gardées, écran sans tableau, « subtasks », tâche en bas de colonne, défilement du tableau seul, données vérifiées, focus 2 px).
