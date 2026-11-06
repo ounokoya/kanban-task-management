@@ -2,6 +2,23 @@
 
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) · Versions : [SemVer](https://semver.org/lang/fr/).
 
+## [1.0.1] — 2026-11-06
+
+Corrections après le rapport IA de Frontend Mentor (9,1 / 10 ; `specs/analyse/2026-11-06-rapport-ia.md`).
+
+### Added
+- S38 : chaque parcours au clavier seul (créer un tableau, ajouter une tâche refusée puis acceptée, cocher une sous-tâche, modifier, supprimer après confirmation, renommer le tableau), résultats vérifiés à l'écran et dans les données gardées.
+- S39 et U8 ; les tests des menus vont jusqu'au résultat (tableau renommé, tâche supprimée).
+
+### Changed
+- Créer un tableau, modifier une tâche, cocher une sous-tâche et retirer une tâche passent par des règles pures (`newBoard`, `editTask`, `toggleSubtask`, `removeTask`) ; le store n'écrit plus l'état directement (ADR-0007).
+- Le contrôleur du glisser-déposer vit dans `src/lib/drag.svelte.js` ; `Board.svelte` garde le rendu (ADR-0009).
+- README : résumé de la réalisation en tête ; 121 tests.
+
+### Fixed
+- Champ au focus clavier : la bordure restait grise (règle de la couche base masquée par l'utilitaire `field`) ; elle est violette et épaissie d'un anneau de 1 px (A7).
+- Chaque carte décrit le déplacement au clavier (Alt + flèches) aux lecteurs d'écran (A9).
+
 ## [1.0.0] — 2026-11-06
 
 Première version (SDL-FM 1.6.0, deuxième challenge Guru avec le fichier Figma).
