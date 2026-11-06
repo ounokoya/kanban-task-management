@@ -1,7 +1,119 @@
 import { test, expect } from '@playwright/test'
-import { open, DATA, THEME_KEY, SIDEBAR_KEY, main, nav, title, card, cardsIn, titlesIn, columnHeading, addTask, boardMenu, taskMenu, themeSwitch, button, dialog, field, status, style, sameColor, pixel, hex, close } from './helpers.js'
+import { open, DATA, THEME_KEY, SIDEBAR_KEY, stored, main, nav, title, boardLink, card, cardsIn, titlesIn, columnHeading, addTask, boardMenu, taskMenu, themeSwitch, button, dialog, alert, group, field, status, style, sameColor, pixel, hex, close } from './helpers.js'
 
-// Spec §6 et §8 — contrôles de bout en bout au clavier et à la souris (S27, S30, S10), puis survol, mouvements, focus (S32 à S34)
+// Spec §6 et §8 — parcours complets au clavier seul (S38 : créer, valider, cocher, modifier, supprimer, renommer),
+// contrôles de bout en bout au clavier et à la souris (S30, S27, S39, S10, menus), puis survol, mouvements, focus (S32 à S34)
+
+const TODO = DATA.boards[0].columns[0].tasks.map((t) => t.title)
+
+// S38 : un tableau créé au clavier seul, refusé vide puis accepté ; il s'ouvre et il est gardé
+test('S38 — clavier seul : créer un tableau, refusé vide puis accepté ; ouvert, adresse, gardé', async ({ page }) => {
+  await open(page, 1440)
+  await button(nav(page), '+ Create New Board').focus()
+  await page.keyboard.press('Enter')
+  const d = dialog(page, 'Add New Board')
+  await expect(d).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(field(d, 'Name')).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(field(d, 'Name')).toHaveAccessibleDescription("Can't be empty")
+  await expect(field(d, 'Name')).toBeFocused()
+  await expect(nav(page).getByText(/^All boards \(3\)$/i)).toBeVisible()
+  await page.keyboard.type('Web Design')
+  await page.keyboard.press('Enter')
+  await expect(d).toBeHidden()
+  await expect(title(page)).toHaveText('Web Design')
+  await expect(page).toHaveURL(/#\/board\/web-design$/)
+  await expect(boardLink(page, 'Web Design')).toHaveAttribute('aria-current', 'page')
+  await expect(columnHeading(page, 'Todo')).toHaveText(/\(0\)$/)
+  expect((await stored(page)).boards.at(-1)).toEqual({ name: 'Web Design', columns: [{ name: 'Todo', tasks: [] }, { name: 'Doing', tasks: [] }] })
+})
+
+// S38 : une tâche ajoutée au clavier seul, refusée vide puis acceptée ; une sous-tâche cochée à la barre d'espace
+test('S38 — clavier seul : ajouter une tâche, refusée vide puis acceptée ; cocher une sous-tâche', async ({ page }) => {
+  await open(page, 1440)
+  await addTask(page).focus()
+  await page.keyboard.press('Enter')
+  const d = dialog(page, 'Add New Task')
+  await page.keyboard.press('Tab')
+  await expect(field(d, 'Title')).toBeFocused()
+  await page.keyboard.press('Enter')
+  const subs = group(d, 'Subtasks')
+  for (const f of [field(d, 'Title'), field(subs, 'Subtask 1'), field(subs, 'Subtask 2')]) await expect(f).toHaveAccessibleDescription("Can't be empty")
+  await expect(field(d, 'Title')).toBeFocused()
+  await page.keyboard.type('Write release notes')
+  await page.keyboard.press('Tab')
+  await page.keyboard.type('Summarise the changes for the launch.')
+  await page.keyboard.press('Tab')
+  await page.keyboard.type('Collect changes')
+  await page.keyboard.press('Tab')
+  await expect(button(subs, 'Remove subtask 1')).toBeFocused()
+  await page.keyboard.press('Tab')
+  await page.keyboard.type('Proofread')
+  await page.keyboard.press('Enter')
+  await expect(d).toBeHidden()
+  expect(await titlesIn(page, 'Todo')).toEqual([...TODO, 'Write release notes'])
+  await expect(columnHeading(page, 'Todo')).toHaveText(/\(5\)$/)
+  const c = card(page, 'Write release notes')
+  await expect(c).toContainText('0 of 2 subtasks')
+  await c.focus()
+  await page.keyboard.press('Enter')
+  const v = dialog(page, 'Write release notes')
+  await page.keyboard.press('Tab')
+  await expect(taskMenu(v)).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(v.getByRole('checkbox', { name: 'Collect changes', exact: true })).toBeFocused()
+  await page.keyboard.press('Space')
+  await expect(v).toContainText('Subtasks (1 of 2)')
+  await expect(status(page)).toContainText('Collect changes')
+  await page.keyboard.press('Escape')
+  await expect(c).toBeFocused()
+  await expect(c).toContainText('1 of 2 subtasks')
+  expect((await stored(page)).boards[0].columns[0].tasks.at(-1)).toEqual({
+    title: 'Write release notes', description: 'Summarise the changes for the launch.', status: 'Todo',
+    subtasks: [{ title: 'Collect changes', isCompleted: true }, { title: 'Proofread', isCompleted: false }],
+  })
+})
+
+// S38 : une tâche modifiée puis supprimée au clavier seul, après confirmation ; le focus suit la carte puis le titre
+test('S38 — clavier seul : modifier une tâche puis la supprimer après confirmation ; le focus suit', async ({ page }) => {
+  await open(page, 1440)
+  await card(page, TODO[2]).focus()
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Tab')
+  await expect(button(page, 'Edit Task')).toBeFocused()
+  await page.keyboard.press('Enter')
+  const d = dialog(page, 'Edit Task')
+  await page.keyboard.press('Tab')
+  await expect(field(d, 'Title')).toHaveValue(TODO[2])
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.type('Build the settings page')
+  await page.keyboard.press('Enter')
+  await expect(d).toBeHidden()
+  const renamed = card(page, 'Build the settings page')
+  await expect(renamed).toBeFocused()
+  expect(await titlesIn(page, 'Todo')).toEqual([TODO[0], TODO[1], 'Build the settings page', TODO[3]])
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Tab')
+  await expect(button(page, 'Delete Task')).toBeFocused()
+  await page.keyboard.press('Enter')
+  const a = alert(page, 'Delete this task?')
+  await expect(a).toContainText("Are you sure you want to delete the 'Build the settings page' task and its subtasks?")
+  await expect(button(a, 'Cancel')).toBeFocused()
+  await page.keyboard.press('Shift+Tab')
+  await expect(button(a, 'Delete')).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(renamed).toHaveCount(0)
+  await expect(columnHeading(page, 'Todo')).toHaveText(/\(3\)$/)
+  await expect(title(page)).toBeFocused()
+  expect((await stored(page)).boards[0].columns[0].tasks.map((t) => t.title)).toEqual([TODO[0], TODO[1], TODO[3]])
+})
+
 
 // S30 : l'interrupteur du thème, à la souris puis au clavier, dans les deux sens, gardé au rechargement
 test('S30 — thème de l\'appareil (sombre), interrupteur à la souris puis au clavier dans les deux sens, choix gardé', async ({ page }) => {
@@ -48,6 +160,19 @@ test('S27 — Alt + ↓ ↑ → ← sur une carte : elle descend, remonte, passe
   await expect(card(page, todo[0])).toBeFocused()
 })
 
+// S39 : la consigne du déplacement au clavier est lue sur chaque carte ; le focus d'un champ ne tient pas qu'à sa couleur
+test('S39 — une carte décrit Alt + flèches ; un champ au focus a une bordure violette épaissie', async ({ page }) => {
+  await open(page, 1440)
+  await expect(card(page, TODO[0])).toHaveAccessibleDescription(/Alt.*arrow/i)
+  await addTask(page).click()
+  const t = field(dialog(page, 'Add New Task'), 'Title')
+  expect(await style(t, 'boxShadow'), 'sans focus : bordure seule').toBe('none')
+  await page.keyboard.press('Tab')
+  await expect(t).toBeFocused()
+  expect(await sameColor(page, await style(t, 'borderTopColor'), '#635fc7'), 'bordure violette').toBe(true)
+  expect(await style(t, 'boxShadow'), 'anneau de 1 px qui épaissit la bordure').toMatch(/0px 0px 0px 1px/)
+})
+
 // S10 : masquer et montrer la barre, au clavier puis à la souris, gardé au rechargement
 test('S10 — « Hide Sidebar » et « Show Sidebar » au clavier puis à la souris ; gardé au rechargement', async ({ page }) => {
   await open(page, 1440)
@@ -64,8 +189,8 @@ test('S10 — « Hide Sidebar » et « Show Sidebar » au clavier puis à la sou
   await expect(button(page, 'Show Sidebar')).toHaveCount(0)
 })
 
-// Menu du tableau au clavier : Entrée ouvre deux boutons, Échap ferme et rend le focus ; Edit Board ouvre le dialogue
-test('Menu du tableau au clavier : Entrée ouvre Edit Board et Delete Board, Échap ferme et rend le focus ; Edit Board ouvre le dialogue', async ({ page }) => {
+// Menu du tableau au clavier : Entrée ouvre deux boutons, Échap ferme et rend le focus ; Edit Board renomme le tableau (S38)
+test('Menu du tableau au clavier : Entrée ouvre Edit Board et Delete Board, Échap ferme et rend le focus ; Edit Board renomme le tableau', async ({ page }) => {
   await open(page, 1440)
   await boardMenu(page).focus()
   await page.keyboard.press('Enter')
@@ -79,11 +204,23 @@ test('Menu du tableau au clavier : Entrée ouvre Edit Board et Delete Board, Éc
   await expect(button(page, 'Edit Board')).toBeFocused()
   await page.keyboard.press('Enter')
   await expect(dialog(page, 'Edit Board')).toBeVisible()
-  await expect(field(dialog(page, 'Edit Board'), 'Board Name')).toHaveValue('Platform Launch')
+  const d = dialog(page, 'Edit Board')
+  await expect(field(d, 'Board Name')).toHaveValue('Platform Launch')
+  await page.keyboard.press('Tab')
+  await expect(field(d, 'Board Name')).toBeFocused()
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.type('Launch')
+  await page.keyboard.press('Enter')
+  await expect(d).toBeHidden()
+  await expect(title(page)).toHaveText('Launch')
+  await expect(boardLink(page, 'Launch')).toHaveAttribute('aria-current', 'page')
+  await expect(page).toHaveURL(/#\/board\/launch$/)
+  await expect(boardMenu(page)).toBeFocused()
+  expect((await stored(page)).boards[0].name).toBe('Launch')
 })
 
 // Menu de la tâche dans « voir une tâche » : il déborde du dialogue, entier et cliquable (maquette « View Task - Active »)
-test('Menu de la tâche : ouvert depuis le dialogue, Edit Task et Delete Task entiers et cliquables hors du dialogue', async ({ page }) => {
+test('Menu de la tâche : ouvert depuis le dialogue, entier et cliquable hors du dialogue ; Delete Task confirmé retire la tâche', async ({ page }) => {
   await open(page, 1440)
   const t = DATA.boards[0].columns[1].tasks[5].title
   await card(page, t).click()
@@ -94,7 +231,10 @@ test('Menu de la tâche : ouvert depuis le dialogue, Edit Task et Delete Task en
   const corners = await menu.evaluate((el) => { const b = el.getBoundingClientRect(); return [[b.left + 8, b.top + 8], [b.right - 8, b.top + 8], [b.right - 8, b.bottom - 8], [b.left + 8, b.bottom - 8]].map(([x, y]) => el.contains(document.elementFromPoint(x, y))) })
   expect(corners, 'coins du menu visibles').toEqual([true, true, true, true])
   await button(page, 'Delete Task').click()
-  await expect(page.getByRole('alertdialog', { name: 'Delete this task?' })).toBeVisible()
+  await button(alert(page, 'Delete this task?'), 'Delete').click()
+  await expect(card(page, t)).toHaveCount(0)
+  await expect(columnHeading(page, 'Doing')).toHaveText(/\(5\)$/)
+  expect((await stored(page)).boards[0].columns[1].tasks.map((task) => task.title)).not.toContain(t)
 })
 
 const hoverCheck = async (page, locator, checks, what) => {

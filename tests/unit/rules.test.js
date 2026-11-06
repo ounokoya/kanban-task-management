@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { boardSlug, validateBoard, validateTask, addTask, setStatus, editBoard, moveTask, subtaskLabel, columnLabel, columnColor, isBoardsData, normalizeBoards } from '../../src/lib/rules.js'
+import { boardSlug, validateBoard, validateTask, addTask, setStatus, editBoard, moveTask, toggleSubtask, removeTask, subtaskLabel, columnLabel, columnColor, isBoardsData, normalizeBoards } from '../../src/lib/rules.js'
 
 // Spec §8 — U1 à U7 : règles de gestion (§2) sans navigateur
 
@@ -83,4 +83,19 @@ test('U7 — données gardées : data.json acceptée, chaque défaut refusé ; a
   const normal = normalizeBoards(DATA)
   for (const b of normal.boards) for (const c of b.columns) for (const t of c.tasks) assert.equal(t.status, c.name, `${b.name} · ${t.title}`)
   assert.equal(DATA.boards[1].columns[0].tasks[1].status, '', 'data.json lui-même n\'est pas modifié')
+})
+
+test('U8 — cocher ou décocher une sous-tâche, retirer une tâche : un nouveau tableau, l\'ancien intact, l\'ordre gardé (D6, D8)', () => {
+  const before = PL()
+  const checked = toggleSubtask(before, { column: 1, index: 5 }, 1, true)
+  assert.equal(checked.columns[1].tasks[5].subtasks[1].isCompleted, true)
+  assert.equal(subtaskLabel(checked.columns[1].tasks[5]), '2 of 3 subtasks')
+  assert.equal(before.columns[1].tasks[5].subtasks[1].isCompleted, false, 'l\'ancien tableau est intact')
+  assert.deepEqual(toggleSubtask(checked, { column: 1, index: 5 }, 1, false).columns[1].tasks[5], before.columns[1].tasks[5])
+  const removed = removeTask(before, { column: 0, index: 2 })
+  assert.deepEqual(titles(removed, 0), titles(before, 0).filter((_, i) => i !== 2))
+  assert.deepEqual(removed.columns.slice(1), before.columns.slice(1), 'les autres colonnes ne bougent pas')
+  assert.equal(before.columns[0].tasks.length, 4, 'l\'ancien tableau est intact')
+  assert.equal(removeTask(before, { column: 0, index: 9 }), before, 'place inconnue : rien ne change')
+  assert.equal(toggleSubtask(before, { column: 0, index: 9 }, 0, true), before, 'place inconnue : rien ne change')
 })
