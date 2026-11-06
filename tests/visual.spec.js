@@ -12,12 +12,22 @@ const research = PL.columns[1].tasks[5].title
 const auth = PL.columns[1].tasks[4].title
 const settings = PL.columns[0].tasks[2].title
 const empty = () => { const d = structuredClone(DATA); d.boards[0].columns = []; return d }
+// Contenu de la maquette là où il diffère de data.json (§3.3, §5 note ¹) : la capture compare la mise en page, pas les données.
+// Voir une tâche : 2 sous-tâches cochées sur 3 ; sur mobile, la 3ᵉ est « Surveying and testing ».
+const mockup = (size) => {
+  const d = structuredClone(DATA); const task = d.boards[0].columns[1].tasks[5]
+  task.subtasks[1].isCompleted = true
+  if (size === 'mobile') task.subtasks[2].title = 'Surveying and testing'
+  return d
+}
+const BOARDS = { 'board-empty': empty, 'view-task': mockup }
 
 const STEPS = {
   'board': async () => {},
   'board-empty': async () => {},
   'board-sidebar-hidden': async () => {},
-  'view-task': async (page) => { await card(page, research).click() },
+  // clic sans faire défiler le tableau : la maquette le montre au début, même quand la carte dépasse à droite (mobile)
+  'view-task': async (page) => { await card(page, research).dispatchEvent('click') },
   'add-task': async (page) => { await addTask(page).click() },
   'edit-task': async (page) => { await card(page, auth).click(); await taskMenu(dialog(page, auth)).click(); await button(page, 'Edit Task').click() },
   'add-board': async (page) => { await page.getByRole('button', { name: '+ Create New Board', exact: true }).first().click() },
@@ -42,7 +52,7 @@ for (const [size, screen] of SCREENS) {
   test(`S37 — ${file} (≤ ${MAX * 100} %)`, async ({ page }, testInfo) => {
     test.skip(!existsSync(REF + file), 'références de la maquette absentes (hors dépôt)')
     await page.emulateMedia({ reducedMotion: 'reduce' })
-    await open(page, WIDTH[size], height, { storedTheme: theme, boards: step === 'board-empty' ? empty() : undefined, sidebar: step === 'board-sidebar-hidden' ? 'hidden' : undefined })
+    await open(page, WIDTH[size], height, { storedTheme: theme, boards: BOARDS[step]?.(size), sidebar: step === 'board-sidebar-hidden' ? 'hidden' : undefined })
     // une page vide claire reste sous 5 % (fond #f4f7fd et cartes blanches proches du blanc) : le contenu doit d'abord être là
     await expect(title(page)).toHaveText('Platform Launch')
     await STEPS[step](page)

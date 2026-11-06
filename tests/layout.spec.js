@@ -47,7 +47,8 @@ const research = DATA.boards[0].columns[1].tasks[5].title
 const DIALOGS = {
   1440: { h: 1024, view: { x: 480, y: 251, width: 480, height: 523 }, del: { x: 480, y: 398, width: 480, height: 229 } },
   768: { h: 1024, view: { x: 144, y: 251, width: 480, height: 523 }, del: { x: 144, y: 398, width: 480, height: 229 } },
-  375: { h: 970, view: { x: 16, y: 207, width: 343, height: 557 }, del: { x: 16, y: 343, width: 343, height: 284 } },
+  // 375 : la 3ᵉ sous-tâche de data.json prend trois lignes, celle de la maquette une seule (spec §5, note ¹)
+  375: { h: 970, view: { x: 16, y: 188, width: 343, height: 595 }, del: { x: 16, y: 343, width: 343, height: 284 } },
 }
 
 for (const [w, v] of Object.entries(DIALOGS)) {

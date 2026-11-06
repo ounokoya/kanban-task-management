@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { open, DATA, KEY, board, nav, title, boardLink, card, titlesIn, columnHeading, addTask, boardMenu, button, dialog, alert, group, field, themeSwitch, style, sameColor, pixel, hex, close } from './helpers.js'
+import { open, DATA, KEY, board, subtaskText, nav, title, boardLink, card, titlesIn, columnHeading, addTask, boardMenu, button, dialog, alert, group, field, themeSwitch, style, sameColor, pixel, hex, close } from './helpers.js'
 
 // Spec §2 (D2), §4, §6 et §8 — S28 à S31 : persistance et thème
 
@@ -38,7 +38,7 @@ test('S28 — tableau, colonne, tâche, sous-tâche, déplacement, suppression :
   await page.reload()
   await expect(boardLink(page, 'Web Design')).toBeVisible()
   expect((await titlesIn(page, 'Done')).at(-1)).toBe(research.title)
-  await expect(card(page, research.title)).toContainText('3 of 3 subtasks')
+  await expect(card(page, research.title)).toContainText(subtaskText({ subtasks: research.subtasks.map((s, i) => ({ isCompleted: s.isCompleted || i === 2 })) }))
   await expect(card(page, gone.title)).toHaveCount(0)
   await expect(columnHeading(page, 'Todo')).toHaveText(/\(3\)$/)
   await boardLink(page, 'Web Design').click()

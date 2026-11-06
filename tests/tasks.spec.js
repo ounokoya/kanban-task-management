@@ -6,7 +6,7 @@ import { open, DATA, board, subtaskText, stored, title, card, cardsIn, titlesIn,
 const PL = board('Platform Launch')
 const research = PL.columns[1].tasks[5]
 
-test('S17 — ouvrir une carte : titre, description, Subtasks (2 of 3), cases, Current Status ; Échap ferme, focus sur la carte', async ({ page }) => {
+test('S17 — ouvrir une carte : titre, description, Subtasks (n of m), cases, Current Status ; Échap ferme, focus sur la carte', async ({ page }) => {
   await open(page, 1440)
   await card(page, research.title).click()
   const d = dialog(page, research.title)
@@ -30,15 +30,18 @@ test('S18 — cocher puis décocher une sous-tâche : compteurs du dialogue et d
   await card(page, research.title).click()
   const d = dialog(page, research.title)
   const todo = research.subtasks.find((s) => !s.isCompleted)
+  // compteurs de data.json (la maquette en montre d'autres, §3.3)
+  const done = research.subtasks.filter((s) => s.isCompleted).length
+  const all = research.subtasks.length
   const box = d.getByRole('checkbox', { name: todo.title, exact: true })
   await box.check()
-  await expect(d).toContainText('Subtasks (3 of 3)')
+  await expect(d).toContainText(`Subtasks (${done + 1} of ${all})`)
   await expect(d.getByText(todo.title, { exact: true })).toHaveCSS('text-decoration-line', 'line-through')
   await expect(status(page)).toContainText(todo.title)
-  await expect(card(page, research.title)).toContainText('3 of 3 subtasks')
+  await expect(card(page, research.title)).toContainText(`${done + 1} of ${all} subtasks`)
   await box.uncheck()
-  await expect(d).toContainText('Subtasks (2 of 3)')
-  await expect(card(page, research.title)).toContainText('2 of 3 subtasks')
+  await expect(d).toContainText(`Subtasks (${done} of ${all})`)
+  await expect(card(page, research.title)).toContainText(`${done} of ${all} subtasks`)
 })
 
 test('S19 — Current Status Doing pour une tâche de Todo : en bas de Doing, Todo (3) et Doing (7)', async ({ page }) => {
