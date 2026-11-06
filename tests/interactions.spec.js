@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test'
-import { open, DATA, THEME_KEY, SIDEBAR_KEY, stored, main, nav, title, boardLink, card, cardsIn, titlesIn, columnHeading, addTask, boardMenu, taskMenu, themeSwitch, button, dialog, alert, group, field, status, style, sameColor, pixel, hex, close } from './helpers.js'
+import { open, DATA, THEME_KEY, SIDEBAR_KEY, board, stored, main, nav, title, boardLink, column, card, cardsIn, titlesIn, columnHeading, addTask, boardMenu, taskMenu, themeSwitch, button, dialog, alert, group, field, status, style, sameColor, pixel, hex, close, pageBox } from './helpers.js'
 
 // Spec §6 et §8 — parcours complets au clavier seul (S38 : créer, valider, cocher, modifier, supprimer, renommer),
-// contrôles de bout en bout au clavier et à la souris (S30, S27, S39, S10, menus), puis survol, mouvements, focus (S32 à S34)
+// parcours à 375 et 768 px (S40), contrôles de bout en bout au clavier et à la souris (S30, S27, S39, S10, menus),
+// puis survol, mouvements, focus (S32 à S34)
 
 const TODO = DATA.boards[0].columns[0].tasks.map((t) => t.title)
 
@@ -114,6 +115,87 @@ test('S38 — clavier seul : modifier une tâche puis la supprimer après confir
   expect((await stored(page)).boards[0].columns[0].tasks.map((t) => t.title)).toEqual([TODO[0], TODO[1], TODO[3]])
 })
 
+
+// S38 : un tableau supprimé au clavier seul ; Cancel ne change rien, Delete le retire et ouvre le suivant
+test('S38 — clavier seul : supprimer un tableau après confirmation ; Cancel ne change rien ; le suivant s\'ouvre, focus sur son titre', async ({ page }) => {
+  await open(page, 1440)
+  await boardMenu(page).focus()
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Tab')
+  await expect(button(page, 'Delete Board')).toBeFocused()
+  await page.keyboard.press('Enter')
+  const a = alert(page, 'Delete this board?')
+  await expect(button(a, 'Cancel')).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(a).toBeHidden()
+  await expect(boardMenu(page)).toBeFocused()
+  await expect(title(page)).toHaveText('Platform Launch')
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Shift+Tab')
+  await expect(button(a, 'Delete')).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(boardLink(page, 'Platform Launch')).toHaveCount(0)
+  await expect(nav(page).getByText(/^All boards \(2\)$/i)).toBeVisible()
+  await expect(title(page)).toHaveText('Marketing Plan')
+  await expect(title(page)).toBeFocused()
+  await expect(page).toHaveURL(/#\/board\/marketing-plan$/)
+  expect((await stored(page)).boards.map((b) => b.name)).toEqual(['Marketing Plan', 'Roadmap'])
+})
+
+// S40 : sur mobile, pas de barre ; le choix du tableau, « + » et le statut mènent au bout ; les colonnes défilent, la page non
+test('S40 — 375 px : sans barre ; choisir Roadmap, ajouter une tâche par « + », changer son statut ; les colonnes défilent', async ({ page }) => {
+  await open(page, 375, 667)
+  await expect(nav(page)).toHaveCount(0)
+  expect((await addTask(page).innerText()).trim(), '« + » seul').toBe('')
+  await title(page).getByRole('button', { name: 'Platform Launch' }).click()
+  await button(dialog(page, 'Select a board'), 'Roadmap').click()
+  await expect(title(page)).toHaveText('Roadmap')
+  await expect(page).toHaveURL(/#\/board\/roadmap$/)
+  await addTask(page).click()
+  const d = dialog(page, 'Add New Task')
+  expect((await pageBox(d)).width, 'dialogue de 343 px').toBe(343)
+  await field(d, 'Title').fill('Plan the beta')
+  for (const n of [2, 1]) await button(group(d, 'Subtasks'), `Remove subtask ${n}`).click()
+  await field(d, 'Status').selectOption('Next')
+  await button(d, 'Create Task').click()
+  await expect(d).toBeHidden()
+  expect(await titlesIn(page, 'Next')).toEqual(['Plan the beta'])
+  await card(page, 'Plan the beta').click()
+  await field(dialog(page, 'Plan the beta'), 'Current Status').selectOption('Later')
+  await page.keyboard.press('Escape')
+  expect(await titlesIn(page, 'Later')).toEqual(['Plan the beta'])
+  await expect(columnHeading(page, 'Next')).toHaveText(/\(0\)$/)
+  const now = await pageBox(column(page, 'Now'))
+  const next = await pageBox(column(page, 'Next'))
+  expect(next.x - now.x, 'colonnes côte à côte : 280 px et 24 px d\'écart').toBe(304)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 'la page ne défile pas en largeur').toBeLessThanOrEqual(0)
+  expect(await main(page).evaluate((el) => el.scrollWidth > el.clientWidth), 'le tableau défile').toBe(true)
+  expect((await stored(page)).boards[2].columns[2].tasks).toEqual([{ title: 'Plan the beta', description: '', status: 'Later', subtasks: [] }])
+  expect(board('Roadmap').columns[2].tasks).toHaveLength(0)
+})
+
+// S40 : sur tablette, la barre de 261 px se masque (colonnes à 24 px) et revient ; une tâche s'ajoute entre les deux
+test('S40 — 768 px : barre de 261 px masquée puis montrée, colonnes à 24 px sans elle ; une tâche ajoutée', async ({ page }) => {
+  await open(page, 768)
+  expect((await pageBox(nav(page))).width).toBe(261)
+  expect((await pageBox(columnHeading(page, 'Todo'))).x).toBe(312)
+  await button(nav(page), 'Hide Sidebar').click()
+  await expect(nav(page)).toHaveCount(0)
+  expect((await pageBox(columnHeading(page, 'Todo'))).x, 'titre de colonne à 24 + 27 px').toBe(51)
+  await addTask(page).click()
+  const d = dialog(page, 'Add New Task')
+  await field(d, 'Title').fill('Tablet check')
+  for (const n of [2, 1]) await button(group(d, 'Subtasks'), `Remove subtask ${n}`).click()
+  await button(d, 'Create Task').click()
+  expect(await titlesIn(page, 'Todo')).toEqual([...TODO, 'Tablet check'])
+  await button(page, 'Show Sidebar').click()
+  await expect(nav(page)).toBeVisible()
+  expect((await pageBox(columnHeading(page, 'Todo'))).x).toBe(312)
+})
 
 // S30 : l'interrupteur du thème, à la souris puis au clavier, dans les deux sens, gardé au rechargement
 test('S30 — thème de l\'appareil (sombre), interrupteur à la souris puis au clavier dans les deux sens, choix gardé', async ({ page }) => {
@@ -270,6 +352,10 @@ test('S32 — survol en sombre (choisi par l\'interrupteur) : carte, Delete, tab
   await boardMenu(page).click()
   await button(page, 'Delete Board').click()
   await hoverCheck(page, button(page.getByRole('alertdialog'), 'Delete'), [['backgroundColor', '#cc1a1a']], 'Delete')
+  await button(page.getByRole('alertdialog'), 'Delete').click()
+  await expect(boardLink(page, 'Platform Launch')).toHaveCount(0)
+  await expect(title(page)).toHaveText('Marketing Plan')
+  expect((await stored(page)).boards.map((b) => b.name)).toEqual(['Marketing Plan', 'Roadmap'])
 })
 
 test('S33 — prefers-reduced-motion : aucune transition', async ({ page }) => {
